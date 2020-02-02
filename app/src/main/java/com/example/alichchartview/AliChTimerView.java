@@ -7,6 +7,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.graphics.Shader;
+import android.graphics.SweepGradient;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -111,7 +113,7 @@ public class AliChTimerView extends View {
 
             mPaintProgress = new Paint();
             mPaintProgress.setAntiAlias(true);
-            mPaintProgress.setStrokeWidth(30);
+            mPaintProgress.setStrokeWidth(mPaintBackgroundProgress.getStrokeWidth());
             mPaintProgress.setColor(mColorProgress);
             mPaintProgress.setStrokeCap(Paint.Cap.ROUND);
             mPaintProgress.setStyle(Paint.Style.STROKE);
@@ -152,6 +154,7 @@ public class AliChTimerView extends View {
                 (float) mHeightBackgroundProgress / 2 - mRadiusBackgroundProgress,
                 (float) mWidthBackgroundProgress / 2 + mRadiusBackgroundProgress,
                 (float) mHeightBackgroundProgress / 2 + mRadiusBackgroundProgress);
+
     }
 
     private float validateStrokeWithBackground(float strokeWith) {

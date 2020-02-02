@@ -16,9 +16,9 @@ public class AliChTimerView extends View {
 
     private Context context;
 
-    private final static int DEFAULT_CURRENT_TIME = 2;
-    private final static int DEFAULT_START_TIME = 0;
-    private final static int DEFAULT_END_TIME = 6;
+    private final static float DEFAULT_CURRENT_TIME = 2;
+    private final static float DEFAULT_START_TIME = 0;
+    private final static float DEFAULT_END_TIME = 6;
     private final static float DEFAULT_BACKGROUND_PROGRESS_RADIUS = dpToPx(80);
     private final static float DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH = dpToPx(20);
     private final static float DEFAULT_CIRCLE_STROKE_WIDTH = 5;
@@ -76,9 +76,9 @@ public class AliChTimerView extends View {
 
             try {
                 //TODO add validation
-                mDegreeProgress = hourToDegree(a.getInteger(R.styleable.AliChTimerView_atv_value_current_time, DEFAULT_CURRENT_TIME));
-                mDegreeStartTime = hourToDegree( a.getInteger(R.styleable.AliChTimerView_atv_value_start_time, DEFAULT_START_TIME));
-                mDegreeEndTime = hourToDegree(a.getInteger(R.styleable.AliChTimerView_atv_value_end_time, DEFAULT_END_TIME));
+                mDegreeProgress = hourToDegree(a.getFloat(R.styleable.AliChTimerView_atv_value_current_time, DEFAULT_CURRENT_TIME));
+                mDegreeStartTime = hourToDegree( a.getFloat(R.styleable.AliChTimerView_atv_value_start_time, DEFAULT_START_TIME));
+                mDegreeEndTime = hourToDegree(a.getFloat(R.styleable.AliChTimerView_atv_value_end_time, DEFAULT_END_TIME));
 
                 mColorBackgroundProgress = a.getColor(R.styleable.AliChTimerView_atv_background_progress_color, DEFAULT_BACKGROUND_PROGRESS_COLOR);
                 mColorStartTime = a.getColor(R.styleable.AliChTimerView_atv_start_time_stroke_color, DEFAULT_START_TIME_STROKE_COLOR);
@@ -258,12 +258,17 @@ public class AliChTimerView extends View {
         return drawY;
     }
 
-    private float hourToDegree(int hour){
+    private float hourToDegree(float hour){
+        if (hour < 0){
+            hour = 12.1f ;
+        }else if (hour > 12){
+            hour = 11.99f ;
+        }
         hour = changeHourForRotate(hour);
         return (hour * 360)/12;
     }
 
-    private int changeHourForRotate(int hour) {
+    private float changeHourForRotate(float hour) {
         return hour + 9;
     }
 

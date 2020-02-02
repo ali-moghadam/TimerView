@@ -22,9 +22,9 @@
         app:atv_end_time_stroke_color="#f44336"
         app:atv_start_time_stroke_color="#1E88E5"
 
-
-        app:atv_value_end_time="9"
-        app:atv_value_current_time="1"
-        app:atv_value_start_time="12" />
+        app:atv_value_start_time="12.15"
+        app:atv_value_end_time="8.30"
+        app:atv_value_current_time="3.07"
+      />
 
 </LinearLayout>

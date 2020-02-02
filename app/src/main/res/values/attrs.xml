@@ -4,13 +4,23 @@
 
         <attr name="atv_background_progress_stroke_width" format="float"/>
         <attr name="atv_circles_stroke_width" format="float"/>
+
         <attr name="atv_background_progress_color" format="color"/>
+        <attr name="atv_background_repeat_color" format="color" />
         <attr name="atv_progress_color" format="color"/>
         <attr name="atv_start_time_stroke_color" format="color"/>
         <attr name="atv_end_time_stroke_color" format="color"/>
+        <attr name="atv_repeat_stroke_color" format="color" />
+        <attr name="atv_text_time_color" format="color" />
 
         <attr name="atv_value_start_time" format="float"/>
         <attr name="atv_value_end_time" format="float"/>
         <attr name="atv_value_current_time" format="float"/>
+        <attr name="atv_value_repeat_start_time" format="float" />
+        <attr name="atv_value_repeat_end_time" format="float" />
+
+        <attr name="atv_text_time_size" format="float" />
+        <attr name="atv_reaming_text_time_size" format="float" />
+        <attr name="atv_value_text_time" format="string" />
     </declare-styleable>
 </resources>

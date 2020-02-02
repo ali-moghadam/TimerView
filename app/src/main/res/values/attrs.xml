@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="AliChTimerView">
+
+        <attr name="atv_background_progress_stroke_width" format="float"/>
+        <attr name="atv_circles_stroke_width" format="float"/>
+        <attr name="atv_background_progress_color" format="color"/>
+        <attr name="atv_progress_color" format="color"/>
+        <attr name="atv_start_time_stroke_color" format="color"/>
+        <attr name="atv_end_time_stroke_color" format="color"/>
+
+        <attr name="atv_value_start_time" format="float"/>
+        <attr name="atv_value_end_time" format="float"/>
+        <attr name="atv_value_current_time" format="float"/>
+    </declare-styleable>
+</resources>

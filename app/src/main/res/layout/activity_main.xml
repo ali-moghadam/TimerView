@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    tools:context=".MainActivity">
+
+    <com.example.alichchartview.AliChTimerView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:padding="30dp"
+
+
+        app:atv_background_progress_color="#E0E0E0"
+
+        app:atv_background_progress_stroke_width="25"
+
+        app:atv_progress_color="#00E676"
+        app:atv_end_time_stroke_color="#f44336"
+        app:atv_start_time_stroke_color="#1E88E5"
+
+
+        app:atv_value_end_time="9"
+        app:atv_value_current_time="1"
+        app:atv_value_start_time="12" />
+
+</LinearLayout>

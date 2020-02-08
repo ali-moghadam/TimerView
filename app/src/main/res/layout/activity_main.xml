@@ -4,32 +4,61 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#ffffff"
     android:gravity="center"
+    android:orientation="vertical"
     tools:context=".MainActivity">
 
+
     <com.example.alichchartview.AliChTimerView
+        android:id="@+id/aliTimerView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-
+        android:layout_height="wrap_content"
         android:padding="30dp"
+        android:layout_weight="1"
 
-        app:atv_background_progress_color="#E0E0E0"
-        app:atv_background_progress_stroke_width="25"
-        app:atv_circles_stroke_width="7"
+        app:atv_color_background_progress="#F5F5F5"
+        app:atv_color_end_time_stroke="#f44336"
+        app:atv_color_progress="#00E676"
+        app:atv_color_repeat_stroke="#FBC02D"
 
-        app:atv_end_time_stroke_color="#f44336"
-        app:atv_progress_color="#00E676"
-        app:atv_start_time_stroke_color="#1E88E5"
-        app:atv_reaming_text_time_size="30"
-        app:atv_repeat_stroke_color="#FBC02D"
-        app:atv_text_time_size="70"
+        app:atv_color_start_time_stroke="#1E88E5"
+        app:atv_stroke_width_background_progress="20dp"
 
-        app:atv_value_current_time="3.5"
-
-        app:atv_value_end_time="6.0"
+        app:atv_stroke_width_circles="3dp"
+        app:atv_text_time="3:00"
         app:atv_value_repeat_end_time="4.30"
-        app:atv_value_start_time="12.15"
         app:atv_value_repeat_start_time="11"
-        app:atv_value_text_time="3:00" />
+
+        app:atv_value_end_time_hour="8"
+        app:atv_value_left_time_hour="0"
+        app:atv_value_start_time_hour="0"
+
+        />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="0"
+        android:textSize="50sp" />
+
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/seekBarHour"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_weight="1"
+        android:max="12"
+        android:progress="0" />
+
+    <androidx.appcompat.widget.AppCompatSeekBar
+        android:id="@+id/seekBarMinute"
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:layout_weight="1"
+        android:max="59"
+        android:progress="0" />
 
 </LinearLayout>

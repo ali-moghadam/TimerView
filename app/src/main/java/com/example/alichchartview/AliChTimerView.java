@@ -10,7 +10,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -30,8 +29,6 @@ public class AliChTimerView extends View {
     private static final String DEFAULT_REAMING_TEXT_TIME = "Reaming Time";
     private final static int DEFAULT_BACKGROUND_PROGRESS_COLOR = Color.parseColor("#F5F5F5");
     private static final float DEFAULT_SPACE = dpToPx(5);
-    private final static float DEFAULT_CURRENT_TIME = 2;
-    private final static float DEFAULT_END_TIME = 6;
     private final static float DEFAULT_REPEAT_START_TIME = 7;
     private final static float DEFAULT_REPEAT_END_TIME = 10;
     private final static float DEFAULT_BACKGROUND_PROGRESS_RADIUS = dpToPx(80);
@@ -66,13 +63,14 @@ public class AliChTimerView extends View {
     private int mColorEndTime;
     private int mColorTextTime;
 
-    @IntRange(from = 0, to = 59)
     private int mStartTimeHour;
     private int mStartTimeMinute;
     private int mEndTimeHour;
     private int mEndTimeMinute;
     private int mLeftTimeHour;
     private int mLeftTimeMinute;
+    private int mRepeatStartHour;
+    private int mRepeatEndHour;
 
     private String mStringTextTime;
     private String mStringReaming;
@@ -366,12 +364,6 @@ public class AliChTimerView extends View {
 
 
         //PROGRESS TIME
-        /*
-        if (mDegreeProgress > mDegreeEndTime)
-            mDegreeProgress = mDegreeEndTime;
-        float sweepAngelTime = (mDegreeStartTime < mDegreeProgress) ? mDegreeProgress - mDegreeStartTime : 360 - mDegreeStartTime + mDegreeProgress;
-        */
-        float sweepAngelTime = (mDegreeStartTime < mDegreeProgress) ? mDegreeProgress - mDegreeStartTime : 360 - mDegreeStartTime + mDegreeProgress;
         canvas.drawArc(mRectProgress, mDegreeStartTime, mDegreeLeftTime, false, mPaintTimeProgress);        //PROGRESS
 
 
@@ -443,6 +435,22 @@ public class AliChTimerView extends View {
         return circleArea;
     }
 
+    private float getDrawXOnBackgroundProgress(float degree, float backgroundRadius, float backgroundWidth) {
+        float drawX = (float) Math.cos(Math.toRadians(degree));
+        drawX *= backgroundRadius;
+        drawX += backgroundWidth / 2;
+        return drawX;
+    }
+
+
+    private float getDrawYOnBackgroundProgress(float degree, float backgroundRadius, float backgroundHeight) {
+        float drawY = (float) Math.sin(Math.toRadians(degree));
+        drawY *= backgroundRadius;
+        drawY += backgroundHeight / 2;
+        return drawY;
+    }
+
+
     //TODO KEEP
     public void setStartTimeHour(@IntRange(from = 0, to = 12) int hour) {
 
@@ -462,21 +470,6 @@ public class AliChTimerView extends View {
         mDegreeStartTime = ((mStartTimeHour * 360) / 12) + ((mStartTimeMinute * degreeOfPerHour) / 60);
 
         invalidate();
-    }
-
-    private float getDrawXOnBackgroundProgress(float degree, float backgroundRadius, float backgroundWidth) {
-        float drawX = (float) Math.cos(Math.toRadians(degree));
-        drawX *= backgroundRadius;
-        drawX += backgroundWidth / 2;
-        return drawX;
-    }
-
-
-    private float getDrawYOnBackgroundProgress(float degree, float backgroundRadius, float backgroundHeight) {
-        float drawY = (float) Math.sin(Math.toRadians(degree));
-        drawY *= backgroundRadius;
-        drawY += backgroundHeight / 2;
-        return drawY;
     }
 
     //TODO KEEP
@@ -558,7 +551,6 @@ public class AliChTimerView extends View {
 
         int degreeOfPerHour = 30;
         mDegreeLeftTime = ((mLeftTimeHour * 360) / 12) + ((mLeftTimeMinute * degreeOfPerHour) / 60);
-        Log.i(TAG, String.format("max:%s | left:%s | start:%s | end:%s", max, mLeftTimeHour, mStartTimeHour, mEndTimeHour));
         invalidate();
     }
 
@@ -567,11 +559,12 @@ public class AliChTimerView extends View {
         //invalidate
         if (minute < 0)
             minute = 0;
-        else if (mLeftTimeHour == (mEndTimeHour - 12))
-            minute = 0;
 
         else if (minute > 59)
             minute = 59;
+
+        else if (mLeftTimeHour == (mEndTimeHour + 3))
+            minute = 0;
 
         mLeftTimeMinute = minute;
 
@@ -583,9 +576,37 @@ public class AliChTimerView extends View {
     }
 
     //TODO KEEP
+    public void setRepeatStartHour(int hour) {
+
+        //invalidate
+        if (hour < 0 || hour > 12)
+            hour = 12;
+
+        // hour
+        this.mLeftTimeHour = hour;
+
+        int max = 0;
+        if (mEndTimeHour > mStartTimeHour) {
+            max = mEndTimeHour - mStartTimeHour;
+        } else if (mEndTimeHour < mStartTimeHour)
+            max = 12 - (mStartTimeHour - mEndTimeHour);
+
+
+        if (mLeftTimeHour >= max) {
+            mLeftTimeHour = max;
+            mLeftTimeMinute = 0;
+        }
+
+        int degreeOfPerHour = 30;
+        mDegreeLeftTime = ((mLeftTimeHour * 360) / 12) + ((mLeftTimeMinute * degreeOfPerHour) / 60);
+        invalidate();
+    }
+
+    //TODO KEEP
     private float getDegreeFromHour(int hour) {
         return (hour * 360) / 12;
     }
+
 
     private float hourToDegree(float hour) {
 //TODO delete it :D
@@ -649,7 +670,7 @@ public class AliChTimerView extends View {
                 break;
         }
 
-        // performClick();
+        //
         return true;
     }
 

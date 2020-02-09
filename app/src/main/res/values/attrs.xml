@@ -21,6 +21,8 @@
         <attr name="atv_value_end_time_minute" format="integer" />
         <attr name="atv_value_left_time_hour" format="integer" />
         <attr name="atv_value_left_time_minute" format="integer" />
+        <attr name="atv_value_repeat_start_hour" format="integer" />
+        <attr name="atv_value_repeat_end_hour" format="integer" />
 
     </declare-styleable>
 </resources>

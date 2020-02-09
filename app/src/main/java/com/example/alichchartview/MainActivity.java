@@ -22,6 +22,23 @@ public class MainActivity extends AppCompatActivity {
         mSeekBarMinute = findViewById(R.id.seekBarMinute);
         mTextView = findViewById(R.id.textView);
 
+        mAliChTimerView.setOnSeekCirclesListener(new OnSeekCirclesListener() {
+            @Override
+            public void OnSeekChangeStartHour(int hour) {
+                mTextView.setText(String.valueOf(hour));
+            }
+
+            @Override
+            public void OnSeekChangeEndHour(int hour) {
+                mTextView.setText(hour + " end");
+            }
+
+            @Override
+            public void OnSeekChangeRepeat(int hour) {
+                mTextView.setText(hour + " repeat");
+            }
+        });
+
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override

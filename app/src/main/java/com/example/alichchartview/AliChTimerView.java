@@ -36,10 +36,9 @@ public class AliChTimerView extends View {
     private final static float DEFAULT_CIRCLE_STROKE_WIDTH = 5;
     private static float DEFAULT_SPACE_TEXT = dpToPx(45);
     private final static int DEFAULT_PROGRESS_COLOR = Color.parseColor("#00E676");
-    ;
     private final static int DEFAULT_START_TIME_STROKE_COLOR = Color.parseColor("#2196F3");
     private final static int DEFAULT_END_TIME_STROKE_COLOR = Color.parseColor("#f44336");
-    private final static int DEFAULT_CLOCK_COLOR = Color.parseColor("#9C27B0");
+    private final static int DEFAULT_CLOCK_COLOR = Color.parseColor("#CFD8DC");
     private final static int DEFAULT_REPEAT_COLOR = Color.parseColor("#FDD835");
     private final static int DEFAULT_TEXT_TIME_COLOR = Color.parseColor("#2196F3");
 
@@ -72,6 +71,7 @@ public class AliChTimerView extends View {
     private int mRepeatStartHour;
     private int mRepeatEndHour;
 
+
     private String mStringTextTime;
     private String mStringReaming;
 
@@ -90,6 +90,20 @@ public class AliChTimerView extends View {
     private RectF mRectRepeatProgress;
     private RectF mRectClock;
 
+    private float mFloatCenterXCircleStartTime;
+    private float mFloatCenterYCircleStartTime;
+    private float mFloatCenterXCircleEndTime;
+    private float mFloatCenterYCircleEndTime;
+    private float mFloatCenterXCircleStartRepeat;
+    private float mFloatCenterYCircleStartRepeat;
+    private float mFloatCenterXCircleEndRepeat;
+    private float mFloatCenterYCircleEndRepeat;
+
+    private float mFloatSweepAngelRepeat;
+
+    private float mFloatLengthOfClockLines;
+    private float mFloatBeginOfClockLines;
+
     private int mWidthBackgroundProgress;
     private int mHeightBackgroundProgress;
 
@@ -98,6 +112,14 @@ public class AliChTimerView extends View {
     private CircleID currentCircleIDForMove;
 
     private boolean moving;
+    private boolean isIndicator;
+
+    private OnSeekCirclesListener onSeekCirclesListener;
+
+
+    public void setOnSeekCirclesListener(OnSeekCirclesListener onSeekCirclesListener) {
+        this.onSeekCirclesListener = onSeekCirclesListener;
+    }
 
     private static void setTextSizeForWidth(Paint paint, float desiredWidth, String text) {
 
@@ -140,11 +162,6 @@ public class AliChTimerView extends View {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AliChTimerView, 0, 0);
 
             try {
-                //TODO add validation
-                //  mDegreeProgress = hourToDegree(a.getFloat(R.styleable.AliChTimerView_atv_value_current_time, DEFAULT_CURRENT_TIME));
-                mDegreeStartRepeatTime = hourToDegree(a.getFloat(R.styleable.AliChTimerView_atv_value_repeat_start_time, DEFAULT_REPEAT_START_TIME));
-                mDegreeEndRepeatTime = hourToDegree(a.getFloat(R.styleable.AliChTimerView_atv_value_repeat_end_time, DEFAULT_REPEAT_END_TIME));
-
 
                 setStartTimeHour(a.getInteger(R.styleable.AliChTimerView_atv_value_start_time_hour, 0));
                 setStartTimeMinute(a.getInteger(R.styleable.AliChTimerView_atv_value_start_time_minute, 0));
@@ -154,6 +171,11 @@ public class AliChTimerView extends View {
 
                 setLeftTimeHour(a.getInteger(R.styleable.AliChTimerView_atv_value_left_time_hour, 0));
                 setLeftTimeMinute(a.getInteger(R.styleable.AliChTimerView_atv_value_left_time_minute, 0));
+
+                setRepeatStartHour(a.getInteger(R.styleable.AliChTimerView_atv_value_repeat_start_hour, 0));
+                setRepeatEndHour(a.getInteger(R.styleable.AliChTimerView_atv_value_repeat_end_hour, 0));
+
+                isIndicator = a.getBoolean(R.styleable.AliChTimerView_atv_is_indicator, true);
 
                 mColorBackgroundProgress = a.getColor(R.styleable.AliChTimerView_atv_color_background_progress, DEFAULT_BACKGROUND_PROGRESS_COLOR);
                 mColorStartTime = a.getColor(R.styleable.AliChTimerView_atv_color_start_time_stroke, DEFAULT_START_TIME_STROKE_COLOR);
@@ -221,9 +243,10 @@ public class AliChTimerView extends View {
 
             mPaintClock = new Paint();
             mPaintClock.setAntiAlias(true);
-            mPaintClock.setStrokeWidth(mPaintBackgroundProgress.getStrokeWidth());
+            mPaintClock.setStrokeWidth(mPaintBackgroundProgress.getStrokeWidth() / 2.3f);
             mPaintClock.setColor(DEFAULT_CLOCK_COLOR);
             mPaintClock.setStyle(Paint.Style.STROKE);
+            mPaintClock.setStrokeCap(Paint.Cap.ROUND);
 
             mPaintTextTime = new Paint();
             mPaintTextTime.setAntiAlias(true);
@@ -272,6 +295,12 @@ public class AliChTimerView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
+        mFloatLengthOfClockLines = mRadiusBackgroundProgress - (mStrokeWithBackgroundProgress) - mStrokeWithCircles * 3;
+        mFloatBeginOfClockLines = mRadiusBackgroundProgress - (mStrokeWithBackgroundProgress);
+
+        mRadiusBackgroundRepeat = mFloatLengthOfClockLines - (mPaintBackgroundRepeat.getStrokeWidth() * 2);
+
+
         mRectProgress.set(
                 (float) mWidthBackgroundProgress / 2 - mRadiusBackgroundProgress,
                 (float) mHeightBackgroundProgress / 2 - mRadiusBackgroundProgress,
@@ -285,10 +314,15 @@ public class AliChTimerView extends View {
                 (float) mHeightBackgroundProgress / 2 + mRadiusBackgroundRepeat);
 
         mRectClock.set(
-                (float) ((mWidthBackgroundProgress / 2) - mRadiusBackgroundProgress) + mPaintBackgroundProgress.getStrokeWidth(),
-                (float) ((mHeightBackgroundProgress / 2) - mRadiusBackgroundProgress) + mPaintBackgroundProgress.getStrokeWidth(),
-                (float) ((mWidthBackgroundProgress / 2) + mRadiusBackgroundProgress) - mPaintBackgroundProgress.getStrokeWidth(),
-                (float) ((mHeightBackgroundProgress / 2) + mRadiusBackgroundProgress) - mPaintBackgroundProgress.getStrokeWidth());
+                ((mWidthBackgroundProgress / 2) - mRadiusBackgroundProgress) + mPaintBackgroundProgress.getStrokeWidth(),
+                ((mHeightBackgroundProgress / 2) - mRadiusBackgroundProgress) + mPaintBackgroundProgress.getStrokeWidth(),
+                ((mWidthBackgroundProgress / 2) + mRadiusBackgroundProgress) - mPaintBackgroundProgress.getStrokeWidth(),
+                ((mHeightBackgroundProgress / 2) + mRadiusBackgroundProgress) - mPaintBackgroundProgress.getStrokeWidth());
+
+
+        setTextSizeForWidth(mPaintTextTime, mRadiusBackgroundRepeat * 1.1f, mStringTextTime);
+        setTextSizeForWidth(mPaintTextReaming, mRadiusBackgroundRepeat * 1.2f, mStringReaming);
+
 
     }
 
@@ -348,82 +382,103 @@ public class AliChTimerView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        float drawX;
-        float drawY;
+
+        mFloatCenterXCircleStartTime = getDrawXOnBackgroundProgress(mDegreeStartTime, mRadiusBackgroundProgress, mWidthBackgroundProgress);
+        mFloatCenterYCircleStartTime = getDrawYOnBackgroundProgress(mDegreeStartTime, mRadiusBackgroundProgress, mHeightBackgroundProgress);
+        //ADD CIRCLE AREA FOR DETECT TOUCH
+        mCircles.add(injectCircleArea(CircleID.CIRCLE_START_TIME, mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth() / 2));
+
+
+        mFloatCenterXCircleEndTime = getDrawXOnBackgroundProgress(mDegreeEndTime, mRadiusBackgroundProgress, mWidthBackgroundProgress);
+        mFloatCenterYCircleEndTime = getDrawYOnBackgroundProgress(mDegreeEndTime, mRadiusBackgroundProgress, mHeightBackgroundProgress);
+        //ADD CIRCLE AREA FOR DETECT TOUCH
+        mCircles.add(injectCircleArea(CircleID.CIRCLE_END_TIME, mFloatCenterXCircleEndTime, mFloatCenterYCircleEndTime, mPaintBackgroundProgress.getStrokeWidth() / 2));
+
+
+        mFloatCenterXCircleStartRepeat = getDrawXOnBackgroundProgress(mDegreeStartRepeatTime, mRadiusBackgroundRepeat, mWidthBackgroundProgress);
+        mFloatCenterYCircleStartRepeat = getDrawYOnBackgroundProgress(mDegreeStartRepeatTime, mRadiusBackgroundRepeat, mHeightBackgroundProgress);
+        //ADD CIRCLE AREA FOR DETECT TOUCH
+        mCircles.add(injectCircleArea(CircleID.CIRCLE_REPEAT_TIME, mFloatCenterXCircleStartRepeat, mFloatCenterYCircleStartRepeat, mPaintBackgroundRepeat.getStrokeWidth()));
+
+/*
+        mFloatCenterXCircleEndRepeat = getDrawXOnBackgroundProgress(mDegreeEndRepeatTime, mRadiusBackgroundRepeat, mWidthBackgroundProgress);
+        mFloatCenterYCircleEndRepeat = getDrawYOnBackgroundProgress(mDegreeEndRepeatTime, mRadiusBackgroundRepeat, mHeightBackgroundProgress);
+        //ADD CIRCLE AREA FOR DETECT TOUCH
+        mCircles.add(injectCircleArea(CircleID.CIRCLE_REPEAT_TIME, mFloatCenterXCircleStartRepeat, mFloatCenterYCircleStartRepeat, mPaintBackgroundRepeat.getStrokeWidth()));
+*/
 
         //BACKGROUNDS
         canvas.drawCircle(mWidthBackgroundProgress / 2, mHeightBackgroundProgress / 2, mRadiusBackgroundProgress, mPaintBackgroundProgress);
         canvas.drawCircle(mWidthBackgroundProgress / 2, mHeightBackgroundProgress / 2, mRadiusBackgroundRepeat, mPaintBackgroundRepeat);
 
 
-        setTextSizeForWidth(mPaintTextTime, mRadiusBackgroundRepeat * 1.2f, mStringTextTime);
-        setTextSizeForWidth(mPaintTextReaming, mRadiusBackgroundRepeat * 1.2f, mStringReaming);
+        //TEXT
 
         canvas.drawText(mStringTextTime, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) + DEFAULT_SPACE_TEXT, mPaintTextTime);
         canvas.drawText(mStringReaming, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) - DEFAULT_SPACE_TEXT, mPaintTextReaming);
 
 
-        //PROGRESS TIME
-        canvas.drawArc(mRectProgress, mDegreeStartTime, mDegreeLeftTime, false, mPaintTimeProgress);        //PROGRESS
+        if (isIndicator) {
+
+            //PROGRESS TIME
+            canvas.drawArc(mRectProgress, mDegreeStartTime, mDegreeLeftTime, false, mPaintTimeProgress);        //PROGRESS
 
 
-        //PROGRESS REPEAT TIME
-        float temp = mDegreeStartRepeatTime;
-        if (temp > mDegreeEndRepeatTime)
-            temp = mDegreeEndRepeatTime;
-        float sweepAngelRepeat = (mDegreeStartRepeatTime < temp) ? temp - mDegreeStartRepeatTime : 360 - mDegreeStartRepeatTime + temp;
-        canvas.drawArc(mRectRepeatProgress, mDegreeStartRepeatTime, sweepAngelRepeat, false, mPaintRepeatProgress);
+            //PROGRESS REPEAT TIME
+            float temp = mDegreeStartRepeatTime;
+            if (temp > mDegreeEndRepeatTime)
+                temp = mDegreeEndRepeatTime;
+            mFloatSweepAngelRepeat = (mDegreeStartRepeatTime < temp) ? temp - mDegreeStartRepeatTime : 360 - mDegreeStartRepeatTime + temp;
+            canvas.drawArc(mRectRepeatProgress, mDegreeStartRepeatTime, 15, false, mPaintRepeatProgress);
+
+        }
+
 
         //CIRCLE START TIME
-        drawX = getDrawXOnBackgroundProgress(mDegreeStartTime, mRadiusBackgroundProgress, mWidthBackgroundProgress);
-        drawY = getDrawYOnBackgroundProgress(mDegreeStartTime, mRadiusBackgroundProgress, mHeightBackgroundProgress);
-
         if (isInEditMode())
-            canvas.drawCircle(drawX, drawY, mPaintBackgroundProgress.getStrokeWidth() / 2, mPaintStartTime);
-        else {
-            fillCircleStrokeBorder(canvas, drawX, drawY, mPaintBackgroundProgress.getStrokeWidth() / 2, Color.WHITE, mStrokeWithCircles, mColorStartTime, mPaintStartTime);
-            //ADD CIRCLE AREA FOR DETECT TOUCH
-            mCircles.add(injectCircleArea(CircleID.CIRCLE_START_TIME, drawX, drawY, mPaintBackgroundProgress.getStrokeWidth() / 2));
-        }
+            canvas.drawCircle(mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth() / 2, mPaintStartTime);
+        else
+            fillCircleStrokeBorder(canvas, mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth() / 2, Color.WHITE, mStrokeWithCircles, mColorStartTime, mPaintStartTime);
+
 
         //CIRCLE END TIME
-        drawX = getDrawXOnBackgroundProgress(mDegreeEndTime, mRadiusBackgroundProgress, mWidthBackgroundProgress);
-        drawY = getDrawYOnBackgroundProgress(mDegreeEndTime, mRadiusBackgroundProgress, mHeightBackgroundProgress);
+
         if (isInEditMode())
-            canvas.drawCircle(drawX, drawY, mPaintBackgroundProgress.getStrokeWidth() / 2, mPaintEndTime);
-        else {
-            fillCircleStrokeBorder(canvas, drawX, drawY, mPaintBackgroundProgress.getStrokeWidth() / 2, Color.WHITE, mStrokeWithCircles, mColorEndTime, mPaintEndTime);
-            //ADD CIRCLE AREA FOR DETECT TOUCH
-            mCircles.add(injectCircleArea(CircleID.CIRCLE_END_TIME, drawX, drawY, mPaintBackgroundProgress.getStrokeWidth() / 2));
-        }
+            canvas.drawCircle(mFloatCenterXCircleEndTime, mFloatCenterYCircleEndTime, mPaintBackgroundProgress.getStrokeWidth() / 2, mPaintEndTime);
+        else
+            fillCircleStrokeBorder(canvas, mFloatCenterXCircleEndTime, mFloatCenterYCircleEndTime, mPaintBackgroundProgress.getStrokeWidth() / 2, Color.WHITE, mStrokeWithCircles, mColorEndTime, mPaintEndTime);
+
 
         //CIRCLE START REPEAT
-        drawX = getDrawXOnBackgroundProgress(mDegreeStartRepeatTime, mRadiusBackgroundRepeat, mWidthBackgroundProgress);
-        drawY = getDrawYOnBackgroundProgress(mDegreeStartRepeatTime, mRadiusBackgroundRepeat, mHeightBackgroundProgress);
         if (isInEditMode())
-            canvas.drawCircle(drawX, drawY, mPaintBackgroundRepeat.getStrokeWidth(), mPaintRepeat);
-        else {
-            fillCircleStrokeBorder(canvas, drawX, drawY, mPaintBackgroundRepeat.getStrokeWidth(), Color.WHITE, mStrokeWithCircles / 2, mColorRepeat, mPaintRepeat);
+            canvas.drawCircle(mFloatCenterXCircleStartRepeat, mFloatCenterYCircleStartRepeat, mPaintBackgroundRepeat.getStrokeWidth(), mPaintRepeat);
+        else
+            fillCircleStrokeBorder(canvas, mFloatCenterXCircleStartRepeat, mFloatCenterYCircleStartRepeat, mPaintBackgroundRepeat.getStrokeWidth(), Color.WHITE, mStrokeWithCircles / 2, mColorRepeat, mPaintRepeat);
 
-            //ADD CIRCLE AREA FOR DETECT TOUCH
-            mCircles.add(injectCircleArea(CircleID.CIRCLE_REPEAT_TIME, drawX, drawY, mPaintBackgroundRepeat.getStrokeWidth()));
+/*
+        //CIRCLE END REPEAT
+        if (isIndicator) {
+            if (isInEditMode())
+                canvas.drawCircle(mFloatCenterXCircleEndRepeat, mFloatCenterYCircleEndRepeat, mPaintBackgroundRepeat.getStrokeWidth() / 2, mPaintRepeat);
+            else
+                fillCircleStrokeBorder(canvas, mFloatCenterXCircleEndRepeat, mFloatCenterYCircleEndRepeat, mPaintBackgroundRepeat.getStrokeWidth() / 2, Color.WHITE, mStrokeWithCircles / 2, mColorRepeat, mPaintRepeat);
+        }
+*/
+        //CLOCK LINES
+        float angel = 0;
+        for (int i = 0; i < 12; i++) {
+            angel += 30;
+
+            float x1 = (float) (Math.cos(Math.toRadians(angel))) * mFloatBeginOfClockLines + (float) (mWidthBackgroundProgress / 2);
+            float y1 = (float) (Math.sin(Math.toRadians(angel))) * mFloatBeginOfClockLines + (float) (mHeightBackgroundProgress / 2);
+            float x2 = (float) (Math.cos(Math.toRadians(angel))) * mFloatLengthOfClockLines + (float) (mWidthBackgroundProgress / 2);
+            float y2 = (float) (Math.sin(Math.toRadians(angel))) * mFloatLengthOfClockLines + (float) (mHeightBackgroundProgress / 2);
+
+            canvas.drawLine(x1, y1, x2, y2, mPaintClock);
         }
 
-        //CIRCLE END REPEAT
-        drawX = getDrawXOnBackgroundProgress(mDegreeEndRepeatTime, mRadiusBackgroundRepeat, mWidthBackgroundProgress);
-        drawY = getDrawYOnBackgroundProgress(mDegreeEndRepeatTime, mRadiusBackgroundRepeat, mHeightBackgroundProgress);
-        if (isInEditMode())
-            canvas.drawCircle(drawX, drawY, mPaintBackgroundRepeat.getStrokeWidth() / 2, mPaintRepeat);
-        else
-            fillCircleStrokeBorder(canvas, drawX, drawY, mPaintBackgroundRepeat.getStrokeWidth() / 2, Color.WHITE, mStrokeWithCircles / 2, mColorRepeat, mPaintRepeat);
-
-
-        //TODO complete it :)
-        //CLOCK
-        //canvas.drawArc(mRectClock, 0, 360, false, mPaintClock);
-
-
     }
+
 
     private CircleArea injectCircleArea(CircleID circleID, float centerX, float centerY, float radius) {
         circleArea = new CircleArea();
@@ -451,18 +506,11 @@ public class AliChTimerView extends View {
     }
 
 
-    //TODO KEEP
     public void setStartTimeHour(@IntRange(from = 0, to = 12) int hour) {
 
-        //invalidate
-        if (hour < 0 || hour > 12)
-            hour = 12;
+        hour = validateHour(hour);
 
-        //rotate
-        if (hour <= 3)
-            hour = hour + 9;
-        else
-            hour = hour - 3;
+        hour = rotateHour(hour);
 
         this.mStartTimeHour = hour;
 
@@ -472,15 +520,10 @@ public class AliChTimerView extends View {
         invalidate();
     }
 
-    //TODO KEEP
-    public void setStartTimeMinute(@IntRange(from = 0, to = 59) int minute) {
-        //invalidate
-        if (minute < 0)
-            minute = 0;
-        else if (minute > 59)
-            minute = 59;
 
-        mStartTimeMinute = minute;
+    public void setStartTimeMinute(@IntRange(from = 0, to = 59) int minute) {
+
+        mStartTimeMinute = validateMinute(minute);
 
         int degreeOfPerHour = 30;
         int degreeOfMinute = (mStartTimeMinute * degreeOfPerHour) / 60;
@@ -489,18 +532,11 @@ public class AliChTimerView extends View {
 
     }
 
-    //TODO KEEP
+
     public void setEndTimeHour(@IntRange(from = 0, to = 12) int hour) {
 
-        //invalidate
-        if (hour < 0 || hour > 12)
-            hour = 12;
-
-        //rotate
-        if (hour <= 3)
-            hour = hour + 9;
-        else
-            hour = hour - 3;
+        hour = validateHour(hour);
+        hour = rotateHour(hour);
 
         this.mEndTimeHour = hour;
 
@@ -510,15 +546,10 @@ public class AliChTimerView extends View {
         invalidate();
     }
 
-    //TODO KEEP
-    public void setEndTimeMinute(@IntRange(from = 0, to = 59) int minute) {
-        //invalidate
-        if (minute < 0)
-            minute = 0;
-        else if (minute > 59)
-            minute = 59;
 
-        mEndTimeMinute = minute;
+    public void setEndTimeMinute(@IntRange(from = 0, to = 59) int minute) {
+
+        mEndTimeMinute = validateMinute(minute);
 
         int degreeOfPerHour = 30;
         int degreeOfMinute = (mEndTimeMinute * degreeOfPerHour) / 60;
@@ -527,22 +558,10 @@ public class AliChTimerView extends View {
 
     }
 
-    //TODO KEEP
     public void setLeftTimeHour(int hour) {
 
-        //invalidate
-        if (hour < 0 || hour > 12)
-            hour = 12;
-
-        // hour
-        this.mLeftTimeHour = hour;
-
-        int max = 0;
-        if (mEndTimeHour > mStartTimeHour) {
-            max = mEndTimeHour - mStartTimeHour;
-        } else if (mEndTimeHour < mStartTimeHour)
-            max = 12 - (mStartTimeHour - mEndTimeHour);
-
+        this.mLeftTimeHour = validateHour(hour);
+        int max = getMaxProgress(mStartTimeHour, mEndTimeHour);
 
         if (mLeftTimeHour >= max) {
             mLeftTimeHour = max;
@@ -554,17 +573,15 @@ public class AliChTimerView extends View {
         invalidate();
     }
 
-    //TODO KEEP
+
     public void setLeftTimeMinute(@IntRange(from = 0, to = 59) int minute) {
-        //invalidate
-        if (minute < 0)
-            minute = 0;
 
-        else if (minute > 59)
-            minute = 59;
+        minute = validateMinute(minute);
+        int max = getMaxProgress(mStartTimeHour, mEndTimeHour);
 
-        else if (mLeftTimeHour == (mEndTimeHour + 3))
+        if (mLeftTimeHour >= max) {
             minute = 0;
+        }
 
         mLeftTimeMinute = minute;
 
@@ -575,52 +592,77 @@ public class AliChTimerView extends View {
 
     }
 
-    //TODO KEEP
+
     public void setRepeatStartHour(int hour) {
 
-        //invalidate
-        if (hour < 0 || hour > 12)
-            hour = 12;
-
-        // hour
-        this.mLeftTimeHour = hour;
-
-        int max = 0;
-        if (mEndTimeHour > mStartTimeHour) {
-            max = mEndTimeHour - mStartTimeHour;
-        } else if (mEndTimeHour < mStartTimeHour)
-            max = 12 - (mStartTimeHour - mEndTimeHour);
-
-
-        if (mLeftTimeHour >= max) {
-            mLeftTimeHour = max;
-            mLeftTimeMinute = 0;
-        }
+        hour = rotateHour(hour);
+        hour = validateHour(hour);
+        this.mRepeatStartHour = validateHour(hour);
 
         int degreeOfPerHour = 30;
-        mDegreeLeftTime = ((mLeftTimeHour * 360) / 12) + ((mLeftTimeMinute * degreeOfPerHour) / 60);
+        mDegreeStartRepeatTime = ((mRepeatStartHour * 360) / 12) + ((mRepeatStartHour * degreeOfPerHour) / 60);
         invalidate();
     }
 
-    //TODO KEEP
+    public void setRepeatEndHour(int hour) {
+
+        hour = rotateHour(hour);
+        hour = validateHour(hour);
+        this.mRepeatEndHour = validateHour(hour);
+
+        int degreeOfPerHour = 30;
+        mDegreeEndRepeatTime = ((mRepeatEndHour * 360) / 12) + ((mRepeatEndHour * degreeOfPerHour) / 60);
+        invalidate();
+    }
+
+
+    private int rotateHour(int hour) {
+        if (hour <= 3)
+            hour = hour + 9;
+        else
+            hour = hour - 3;
+
+        return hour;
+    }
+
+    private int getMaxProgress(int start, int end) {
+        int max = 0;
+        if (end > start) {
+            max = end - start;
+        } else if (end < start)
+            max = 12 - (start - end);
+
+        return max;
+    }
+
+    private int validateHour(int hour) {
+        if (hour < 0 || hour > 12)
+            hour = 12;
+
+        return hour;
+    }
+
+    private int validateMinute(int minute) {
+        if (minute < 0)
+            minute = 0;
+
+        else if (minute > 59)
+            minute = 59;
+
+        return minute;
+    }
+
+
     private float getDegreeFromHour(int hour) {
         return (hour * 360) / 12;
     }
 
 
-    private float hourToDegree(float hour) {
-//TODO delete it :D
-        if (hour < 0) {
-            hour = 12.1f;
-        } else if (hour > 12) {
-            hour = 11.99f;
-        }
-        hour = changeHourForRotate(hour);
-        return (hour * 360) / 12;
-    }
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+
+        if (isIndicator)
+            return false;
 
         int x = (int) event.getX();
         int y = (int) event.getY();
@@ -647,18 +689,32 @@ public class AliChTimerView extends View {
             case MotionEvent.ACTION_MOVE:
 
                 if (moving) {
-                    angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) + 270;
+                    angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
+
+                    int hour = (int) (angel + 90) / 30;
+                    if (hour == 0) {
+                        hour = 12;
+                    }
+
                     switch (currentCircleIDForMove) {
                         case CIRCLE_START_TIME:
-                            // if (mDegreeEndTime < mDegreeStartTime)
                             mDegreeStartTime = (float) angel;
+
+                            if (onSeekCirclesListener != null)
+                                onSeekCirclesListener.OnSeekChangeStartHour(hour);
+
                             break;
                         case CIRCLE_END_TIME:
-                            //  if (mDegreeEndTime <= mDegreeStartTime)
                             mDegreeEndTime = (float) angel;
+
+                            if (onSeekCirclesListener != null)
+                                onSeekCirclesListener.OnSeekChangeEndHour(hour);
+
                             break;
                         case CIRCLE_REPEAT_TIME:
                             mDegreeStartRepeatTime = (float) angel;
+                            if (onSeekCirclesListener != null)
+                                onSeekCirclesListener.OnSeekChangeRepeat(hour);
                             break;
                     }
                     invalidate();
@@ -674,9 +730,6 @@ public class AliChTimerView extends View {
         return true;
     }
 
-    private float changeHourForRotate(float hour) {
-        return hour + 9;
-    }
 
     private int getDesireHeight() {
         return (int) ((mRadiusBackgroundProgress * 2) + mPaintBackgroundProgress.getStrokeWidth() + getVerticalPadding());

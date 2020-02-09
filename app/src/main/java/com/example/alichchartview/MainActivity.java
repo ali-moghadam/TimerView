@@ -1,10 +1,12 @@
 package com.example.alichchartview;
 
 import android.os.Bundle;
+import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SwitchCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -12,6 +14,7 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar mSeekBar;
     private SeekBar mSeekBarMinute;
     private TextView mTextView;
+    private SwitchCompat mSwitch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +24,16 @@ public class MainActivity extends AppCompatActivity {
         mSeekBar = findViewById(R.id.seekBarHour);
         mSeekBarMinute = findViewById(R.id.seekBarMinute);
         mTextView = findViewById(R.id.textView);
+        mSwitch = findViewById(R.id.mySwitch);
+
+        mSwitch.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mAliChTimerView.setIsIndicator(mSwitch.isChecked());
+                mAliChTimerView.invalidate();
+
+            }
+        });
 
         mAliChTimerView.setOnSeekCirclesListener(new OnSeekCirclesListener() {
             @Override

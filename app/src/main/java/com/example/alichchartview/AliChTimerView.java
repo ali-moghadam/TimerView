@@ -26,12 +26,9 @@ public class AliChTimerView extends View {
     private Context context;
 
     private static final String DEFAULT_TEXT_TIME = "3:00";
-    private static final String DEFAULT_REAMING_TEXT_TIME = "Reaming Time";
+    private static final String DEFAULT_TEXT_STATUS = "Reaming Time";
     private final static int DEFAULT_BACKGROUND_PROGRESS_COLOR = Color.parseColor("#F5F5F5");
-    private static final float DEFAULT_SPACE = dpToPx(5);
-    private final static float DEFAULT_REPEAT_START_TIME = 7;
-    private final static float DEFAULT_REPEAT_END_TIME = 10;
-    private final static float DEFAULT_BACKGROUND_PROGRESS_RADIUS = dpToPx(80);
+    private final static float DEFAULT_BACKGROUND_PROGRESS_RADIUS = dpToPx(120);
     private final static float DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH = dpToPx(20);
     private final static float DEFAULT_CIRCLE_STROKE_WIDTH = 5;
     private static float DEFAULT_SPACE_TEXT = dpToPx(45);
@@ -42,7 +39,6 @@ public class AliChTimerView extends View {
     private final static int DEFAULT_REPEAT_COLOR = Color.parseColor("#FDD835");
     private final static int DEFAULT_TEXT_TIME_COLOR = Color.parseColor("#2196F3");
 
-    private float mDegreeProgress;
     private float mDegreeStartTime;
     private float mDegreeEndTime;
     private float mDegreeLeftTime;
@@ -73,7 +69,7 @@ public class AliChTimerView extends View {
 
 
     private String mStringTextTime;
-    private String mStringReaming;
+    private String mStringTextStatus;
 
     private Paint mPaintBackgroundProgress;
     private Paint mPaintBackgroundRepeat;
@@ -96,8 +92,6 @@ public class AliChTimerView extends View {
     private float mFloatCenterYCircleEndTime;
     private float mFloatCenterXCircleStartRepeat;
     private float mFloatCenterYCircleStartRepeat;
-    private float mFloatCenterXCircleEndRepeat;
-    private float mFloatCenterYCircleEndRepeat;
 
     private float mFloatSweepAngelRepeat;
 
@@ -116,11 +110,6 @@ public class AliChTimerView extends View {
 
     private OnSeekCirclesListener onSeekCirclesListener;
 
-
-    public void setOnSeekCirclesListener(OnSeekCirclesListener onSeekCirclesListener) {
-        this.onSeekCirclesListener = onSeekCirclesListener;
-    }
-
     private static void setTextSizeForWidth(Paint paint, float desiredWidth, String text) {
 
         final float testTextSize = 48f;
@@ -133,6 +122,36 @@ public class AliChTimerView extends View {
         DEFAULT_SPACE_TEXT = desiredTextSize * 2;
 
         paint.setTextSize(desiredTextSize);
+    }
+
+    private static void setTextSizeForWidthSingleText(Paint paint, float desiredWidth, String text) {
+
+        final float testTextSize = 48f;
+
+        paint.setTextSize(testTextSize);
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+
+        float desiredTextSize = testTextSize * desiredWidth / bounds.width();
+        DEFAULT_SPACE_TEXT = desiredTextSize / 2;
+
+        paint.setTextSize(desiredTextSize);
+    }
+
+    public void setOnSeekCirclesListener(OnSeekCirclesListener onSeekCirclesListener) {
+        this.onSeekCirclesListener = onSeekCirclesListener;
+    }
+
+    public void setIsIndicator(boolean isIndicator) {
+        this.isIndicator = isIndicator;
+    }
+
+    public void setTextTime(String time) {
+        this.mStringTextTime = time;
+    }
+
+    public void setTextStatus(String status) {
+        this.mStringTextStatus = status;
     }
 
     public AliChTimerView(Context context) {
@@ -155,7 +174,7 @@ public class AliChTimerView extends View {
     private void init(AttributeSet attrs) {
 
         mStringTextTime = DEFAULT_TEXT_TIME;
-        mStringReaming = DEFAULT_REAMING_TEXT_TIME;
+        mStringTextStatus = DEFAULT_TEXT_STATUS;
 
         if (attrs != null) {
 
@@ -184,14 +203,19 @@ public class AliChTimerView extends View {
                 mColorRepeat = a.getColor(R.styleable.AliChTimerView_atv_color_repeat_stroke, DEFAULT_REPEAT_COLOR);
                 mColorTextTime = a.getColor(R.styleable.AliChTimerView_atv_color_text_time, DEFAULT_TEXT_TIME_COLOR);
 
+                mStrokeWithCircles = a.getDimension(R.styleable.AliChTimerView_atv_stroke_width_circles, DEFAULT_CIRCLE_STROKE_WIDTH);
+                mStrokeWithBackgroundProgress = a.getDimension(R.styleable.AliChTimerView_atv_stroke_width_background_progress, DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH);
+
                 mStringTextTime = a.getString(R.styleable.AliChTimerView_atv_text_time);
                 if (mStringTextTime == null)
                     mStringTextTime = DEFAULT_TEXT_TIME;
-                if (mStringTextTime.equals(""))
-                    mStringTextTime = DEFAULT_TEXT_TIME;
 
-                mStrokeWithCircles = a.getDimension(R.styleable.AliChTimerView_atv_stroke_width_circles, DEFAULT_CIRCLE_STROKE_WIDTH);
-                mStrokeWithBackgroundProgress = a.getDimension(R.styleable.AliChTimerView_atv_stroke_width_background_progress, DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH);
+
+                mStringTextStatus = a.getString(R.styleable.AliChTimerView_atv_text_status);
+                if (mStringTextStatus == null)
+                    mStringTextStatus = DEFAULT_TEXT_STATUS;
+
+
             } finally {
                 a.recycle();
             }
@@ -295,10 +319,11 @@ public class AliChTimerView extends View {
     protected void onSizeChanged(int w, int h, int oldw, int oldh) {
         super.onSizeChanged(w, h, oldw, oldh);
 
-        mFloatLengthOfClockLines = mRadiusBackgroundProgress - (mStrokeWithBackgroundProgress) - mStrokeWithCircles * 3;
         mFloatBeginOfClockLines = mRadiusBackgroundProgress - (mStrokeWithBackgroundProgress);
+        mFloatLengthOfClockLines = mRadiusBackgroundProgress - (mStrokeWithBackgroundProgress) - mStrokeWithCircles * 3;
 
         mRadiusBackgroundRepeat = mFloatLengthOfClockLines - (mPaintBackgroundRepeat.getStrokeWidth() * 2);
+        // mRadiusBackgroundRepeat = mRadiusBackgroundProgress - (mPaintBackgroundProgress.getStrokeWidth() + DEFAULT_SPACE);
 
 
         mRectProgress.set(
@@ -320,8 +345,15 @@ public class AliChTimerView extends View {
                 ((mHeightBackgroundProgress / 2) + mRadiusBackgroundProgress) - mPaintBackgroundProgress.getStrokeWidth());
 
 
-        setTextSizeForWidth(mPaintTextTime, mRadiusBackgroundRepeat * 1.1f, mStringTextTime);
-        setTextSizeForWidth(mPaintTextReaming, mRadiusBackgroundRepeat * 1.2f, mStringReaming);
+        if (mStringTextStatus.equals("")) {
+            setTextSizeForWidthSingleText(mPaintTextTime, mRadiusBackgroundRepeat, mStringTextTime);
+
+
+        } else {
+            setTextSizeForWidth(mPaintTextTime, mRadiusBackgroundRepeat * 1.1f, mStringTextTime);
+            setTextSizeForWidth(mPaintTextReaming, mRadiusBackgroundRepeat * 1.2f, mStringTextStatus);
+        }
+
 
 
     }
@@ -348,6 +380,7 @@ public class AliChTimerView extends View {
 
             case MeasureSpec.AT_MOST:
                 mWidthBackgroundProgress = Math.min(widthMeasureSize, getDesireWidth() + getHorizontalPadding());
+
                 break;
         }
 
@@ -359,10 +392,13 @@ public class AliChTimerView extends View {
 
             case MeasureSpec.EXACTLY:
                 mHeightBackgroundProgress = heightMeasureSize + getVerticalPadding();
+
+
                 break;
 
             case MeasureSpec.AT_MOST:
-                mHeightBackgroundProgress = Math.min(heightMeasureSize, getDesireHeight());
+                mHeightBackgroundProgress = Math.min(heightMeasureSize, getDesireHeight() + getHorizontalPadding());
+
                 break;
         }
 
@@ -372,8 +408,6 @@ public class AliChTimerView extends View {
         } else {
             mRadiusBackgroundProgress = DEFAULT_BACKGROUND_PROGRESS_RADIUS;
         }
-
-        mRadiusBackgroundRepeat = mRadiusBackgroundProgress - (mPaintBackgroundProgress.getStrokeWidth() + DEFAULT_SPACE);
 
         setMeasuredDimension(mWidthBackgroundProgress, mHeightBackgroundProgress);
     }
@@ -415,7 +449,7 @@ public class AliChTimerView extends View {
         //TEXT
 
         canvas.drawText(mStringTextTime, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) + DEFAULT_SPACE_TEXT, mPaintTextTime);
-        canvas.drawText(mStringReaming, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) - DEFAULT_SPACE_TEXT, mPaintTextReaming);
+        canvas.drawText(mStringTextStatus, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) - DEFAULT_SPACE_TEXT, mPaintTextReaming);
 
 
         if (isIndicator) {

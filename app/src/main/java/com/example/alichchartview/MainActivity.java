@@ -29,7 +29,16 @@ public class MainActivity extends AppCompatActivity {
         mSwitch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mAliChTimerView.setIsIndicator(mSwitch.isChecked());
+
+                if (mSwitch.isChecked()) {
+                    mAliChTimerView.setIsIndicator(true);
+                    mAliChTimerView.setTextCenter("03:00");
+                    mAliChTimerView.setTextStatus("Reaming time");
+                } else {
+                    mAliChTimerView.setIsIndicator(true);
+                    mAliChTimerView.setTextCenter("00:00");
+                    mAliChTimerView.setTextStatus("");
+                }
                 mAliChTimerView.invalidate();
 
             }
@@ -37,18 +46,18 @@ public class MainActivity extends AppCompatActivity {
 
         mAliChTimerView.setOnSeekCirclesListener(new OnSeekCirclesListener() {
             @Override
-            public void OnSeekChangeStartHour(int hour) {
-                mTextView.setText(String.valueOf(hour));
+            public void OnSeekChangeStartHour(int hour, int minute) {
+                mTextView.setText(String.format("hour:%s \t minute:%s", hour, minute));
             }
 
             @Override
-            public void OnSeekChangeEndHour(int hour) {
-                mTextView.setText(hour + " end");
+            public void OnSeekChangeEndHour(int hour, int minute) {
+                mTextView.setText(String.format("hour:%s \t minute:%s", hour, minute));
             }
 
             @Override
-            public void OnSeekChangeRepeat(int hour) {
-                mTextView.setText(hour + " repeat");
+            public void OnSeekChangeRepeat(int hour, int minute) {
+                mTextView.setText(String.format("hour:%s \t minute:%s", hour, minute));
             }
         });
 

@@ -2,7 +2,7 @@
 <resources>
     <declare-styleable name="AliChTimerView">
 
-        <attr name="atv_text_time" format="string" />
+        <attr name="atv_text_center" format="string" />
         <attr name="atv_text_status" format="string" />
         <attr name="atv_color_background_progress" format="color" />
         <attr name="atv_color_background_repeat" format="color" />

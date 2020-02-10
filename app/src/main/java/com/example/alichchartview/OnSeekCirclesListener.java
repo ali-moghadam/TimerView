@@ -1,9 +1,9 @@
 package com.example.alichchartview;
 
 public interface OnSeekCirclesListener {
-    void OnSeekChangeStartHour(int hour);
+    void OnSeekChangeStartHour(int hour, int minute);
 
-    void OnSeekChangeEndHour(int hour);
+    void OnSeekChangeEndHour(int hour, int minute);
 
-    void OnSeekChangeRepeat(int hour);
+    void OnSeekChangeRepeat(int hour, int minute);
 }

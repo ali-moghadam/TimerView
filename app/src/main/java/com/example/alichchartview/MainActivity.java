@@ -1,12 +1,10 @@
 package com.example.alichchartview;
 
 import android.os.Bundle;
-import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SwitchCompat;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -14,7 +12,6 @@ public class MainActivity extends AppCompatActivity {
     private SeekBar mSeekBar;
     private SeekBar mSeekBarMinute;
     private TextView mTextView;
-    private SwitchCompat mSwitch;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -24,49 +21,49 @@ public class MainActivity extends AppCompatActivity {
         mSeekBar = findViewById(R.id.seekBarHour);
         mSeekBarMinute = findViewById(R.id.seekBarMinute);
         mTextView = findViewById(R.id.textView);
-        mSwitch = findViewById(R.id.mySwitch);
 
-        mSwitch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
 
-                if (mSwitch.isChecked()) {
-                    mAliChTimerView.setIsIndicator(true);
-                    mAliChTimerView.setTextCenter("03:00");
-                    mAliChTimerView.setTextStatus("Reaming time");
-                } else {
-                    mAliChTimerView.setIsIndicator(true);
-                    mAliChTimerView.setTextCenter("00:00");
-                    mAliChTimerView.setTextStatus("");
-                }
-                mAliChTimerView.invalidate();
 
-            }
-        });
 
         mAliChTimerView.setOnSeekCirclesListener(new OnSeekCirclesListener() {
             @Override
-            public void OnSeekChangeStartHour(int hour, int minute) {
-                mTextView.setText(String.format("hour:%s \t minute:%s", hour, minute));
+            public void OnSeekChange(AliChTimerView.CircleID circleID, int hour, int minute) {
+                String mStringHour = Utils.addZeroBeforeTime(hour);
+                String mStringMinute = Utils.addZeroBeforeTime(minute);
+
+                mTextView.setText(String.format("hour:%s \t minute:%s", mStringHour, mStringMinute));
+
+                mAliChTimerView.setTextCenter(mStringHour + ":" + mStringMinute);
+
+
+                String status;
+                switch (circleID) {
+                    case CIRCLE_START_TIME:
+                        status = "start time";
+                        break;
+                    case CIRCLE_REPEAT_TIME:
+                        status = "repeat time";
+                        break;
+                    case CIRCLE_END_TIME:
+                        status = "end time";
+                        break;
+
+                    case NONE:
+                    default:
+                        status = "NONE";
+
+                }
+
+                //  mAliChTimerView.setTextStatus(status);
             }
 
-            @Override
-            public void OnSeekChangeEndHour(int hour, int minute) {
-                mTextView.setText(String.format("hour:%s \t minute:%s", hour, minute));
-            }
 
-            @Override
-            public void OnSeekChangeRepeat(int hour, int minute) {
-                mTextView.setText(String.format("hour:%s \t minute:%s", hour, minute));
-            }
         });
 
 
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // mAliChTimerView.setStartTimeHour(progress);
-                // mAliChTimerView.setEndTimeHour(progress);
                 mAliChTimerView.setLeftTimeHour(progress);
                 mTextView.setText(String.valueOf(progress));
             }
@@ -85,8 +82,6 @@ public class MainActivity extends AppCompatActivity {
         mSeekBarMinute.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // mAliChTimerView.setStartTimeMinute(progress);
-                // mAliChTimerView.setEndTimeMinute(progress);
                 mAliChTimerView.setLeftTimeMinute(progress);
                 mTextView.setText(String.valueOf(progress));
             }
@@ -103,4 +98,6 @@ public class MainActivity extends AppCompatActivity {
         });
 
     }
+
+
 }

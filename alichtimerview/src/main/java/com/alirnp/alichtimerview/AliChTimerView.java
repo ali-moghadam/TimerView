@@ -99,6 +99,7 @@ public class AliChTimerView extends View {
     private List<CircleArea> mCircles = new ArrayList<>();
     private CircleArea circleArea = new CircleArea();
     private CircleID currentCircleIDForMove;
+    int tempHour = -1;
 
     private boolean accessMoving;
     private boolean isIndicator;
@@ -679,17 +680,22 @@ public class AliChTimerView extends View {
         return (hour * 360) / 12;
     }
 
+    private AM_PM amPm = AM_PM.AM;
+
     @Override
     public boolean onTouchEvent(MotionEvent event) {
 
         if (isIndicator)
             return false;
-        int hour = 0;
-        int minute = 0;
+
+        int hour;
+        int minute;
 
 
         int x = (int) event.getX();
         int y = (int) event.getY();
+
+
         double angel;
 
         switch (event.getAction()) {
@@ -734,8 +740,11 @@ public class AliChTimerView extends View {
                             break;
                     }
 
+                    changeAmPm(hour, tempHour);
+                    tempHour = hour;
+
                     if (onSeekCirclesListener != null)
-                        onSeekCirclesListener.OnSeekChange(currentCircleIDForMove, hour, minute);
+                        onSeekCirclesListener.OnSeekChange(currentCircleIDForMove, amPm, hour, minute);
                     invalidate();
                 }
                 break;
@@ -757,6 +766,25 @@ public class AliChTimerView extends View {
         return true;
     }
 
+    private void changeAmPm(int hour, int tempHour) {
+        if (tempHour == -1) tempHour = hour;
+        if (hour == 12) {
+            if (tempHour == 11)
+                revertAmPm();
+
+        } else if (hour == 11) {
+            if (tempHour == 12)
+                revertAmPm();
+        }
+    }
+
+    private void revertAmPm() {
+        if (amPm == AM_PM.AM)
+            amPm = AM_PM.PM;
+        else
+            amPm = AM_PM.AM;
+    }
+
     private int getHourFromAngel(double angel) {
         int hour = (int) (angel + 90) / 30;
         if (hour == 0) {
@@ -764,6 +792,7 @@ public class AliChTimerView extends View {
         }
         return hour;
     }
+
 
     private int getMinuteFromAngel(double angel) {
         int maxMinute = 59;
@@ -790,6 +819,10 @@ public class AliChTimerView extends View {
 
     private int getHorizontalPadding() {
         return getPaddingLeft() + getPaddingRight();
+    }
+
+    public void setAmPm(AM_PM amPm) {
+        this.amPm = amPm;
     }
 
     @Override
@@ -819,6 +852,11 @@ public class AliChTimerView extends View {
         CIRCLE_START_TIME,
         CIRCLE_END_TIME,
         CIRCLE_REPEAT_TIME
+    }
+
+    public enum AM_PM {
+        AM,
+        PM
     }
 
     private static class CircleArea {

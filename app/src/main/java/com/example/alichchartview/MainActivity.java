@@ -32,11 +32,11 @@ public class MainActivity extends AppCompatActivity {
 
         mAliChTimerView.setOnSeekCirclesListener(new OnSeekCirclesListener() {
             @Override
-            public void OnSeekChange(AliChTimerView.CircleID circleID, int hour, int minute) {
+            public void OnSeekChange(AliChTimerView.CircleID circleID, AliChTimerView.AM_PM am_pm, int hour, int minute) {
                 String mStringHour = Utils.addZeroBeforeTime(hour);
                 String mStringMinute = Utils.addZeroBeforeTime(minute);
 
-                mTextView.setText(String.format("hour:%s \t minute:%s", mStringHour, mStringMinute));
+                mTextView.setText(String.format("hour:%s \t minute:%s \namPm:%s", mStringHour, mStringMinute, am_pm));
 
                 mAliChTimerView.setTextCenter(mStringHour + ":" + mStringMinute);
 

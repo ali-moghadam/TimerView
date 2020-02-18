@@ -6,7 +6,12 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.alirnp.alichtimerview.AliChTimerView;
+import com.alirnp.alichtimerview.OnSeekCirclesListener;
+
 public class MainActivity extends AppCompatActivity {
+
+    private AliChTimerView aliChTimerView;
 
     private AliChTimerView mAliChTimerView;
     private SeekBar mSeekBar;
@@ -55,6 +60,11 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 //  mAliChTimerView.setTextStatus(status);
+            }
+
+            @Override
+            public void OnSeekComplete(AliChTimerView.CircleID circleID, int hour, int minute) {
+
             }
 
 

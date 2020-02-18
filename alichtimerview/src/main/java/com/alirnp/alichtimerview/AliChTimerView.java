@@ -1,4 +1,4 @@
-package com.example.alichchartview;
+package com.alirnp.alichtimerview;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -613,7 +613,6 @@ public class AliChTimerView extends View {
 
     public void setRepeatStartHour(int hour) {
 
-        isShowRepeat = true;
 
         hour = rotateHour(hour);
         hour = validateHour(hour);
@@ -685,6 +684,9 @@ public class AliChTimerView extends View {
 
         if (isIndicator)
             return false;
+        int hour = 0;
+        int minute = 0;
+
 
         int x = (int) event.getX();
         int y = (int) event.getY();
@@ -715,17 +717,8 @@ public class AliChTimerView extends View {
                 if (accessMoving) {
                     angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
 
-                    int hour = (int) (angel + 90) / 30;
-                    if (hour == 0) {
-                        hour = 12;
-                    }
-
-                    int maxMinute = 59;
-                    int maxMinuteDegree = 29;
-                    int perClockDegree = 30;
-                    int minute = (int) (((angel + 90) % perClockDegree) * maxMinute) / maxMinuteDegree;
-                    if (minute == 60)
-                        minute = 59;
+                    hour = getHourFromAngel(angel);
+                    minute = getMinuteFromAngel(angel);
 
                     switch (currentCircleIDForMove) {
                         case CIRCLE_START_TIME:
@@ -747,6 +740,11 @@ public class AliChTimerView extends View {
                 }
                 break;
             case MotionEvent.ACTION_UP:
+
+                if (onSeekCirclesListener != null) {
+                    angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
+                    onSeekCirclesListener.OnSeekComplete(currentCircleIDForMove, getHourFromAngel(angel), getMinuteFromAngel(angel));
+                }
                 accessMoving = false;
                 currentCircleIDForMove = CircleID.NONE;
                 break;
@@ -757,6 +755,24 @@ public class AliChTimerView extends View {
         }
 
         return true;
+    }
+
+    private int getHourFromAngel(double angel) {
+        int hour = (int) (angel + 90) / 30;
+        if (hour == 0) {
+            hour = 12;
+        }
+        return hour;
+    }
+
+    private int getMinuteFromAngel(double angel) {
+        int maxMinute = 59;
+        int maxMinuteDegree = 29;
+        int perClockDegree = 30;
+        int minute = (int) (((angel + 90) % perClockDegree) * maxMinute) / maxMinuteDegree;
+        if (minute == 60)
+            minute = 59;
+        return minute;
     }
 
 
@@ -855,5 +871,5 @@ public class AliChTimerView extends View {
         }
     }
 
-
 }
+

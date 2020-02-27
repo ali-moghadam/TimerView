@@ -10,7 +10,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -470,37 +469,16 @@ public class AliChTimerView extends View {
 
         if (isIndicator) {
 
-            //PROGRESS TIME
-            float sweep;
-            float temp;
+            float max = (mDegreeEndTime > mDegreeStartTime) ? mDegreeEndTime - mDegreeStartTime : (360 - mDegreeStartTime) + mDegreeEndTime;
+            float sweep = (mDegreeCurrentTime > mDegreeStartTime) ? mDegreeCurrentTime - mDegreeStartTime : 360 - (mDegreeStartTime - mDegreeCurrentTime);
 
-            temp = mDegreeStartTime;
-            if (temp > mDegreeCurrentTime)
-                temp = mDegreeCurrentTime;
-            float start = (mDegreeStartTime < temp) ? temp - mDegreeStartTime : 360 - mDegreeStartTime + temp;
-
-            float end = (mDegreeEndTime > mDegreeStartTime) ? mDegreeEndTime - mDegreeStartTime : 360 - mDegreeStartTime + mDegreeEndTime;
-
-
-            sweep = (mDegreeCurrentTime > mDegreeStartTime) ? mDegreeCurrentTime - mDegreeStartTime : 360 - (mDegreeStartTime - mDegreeCurrentTime);
+            if (sweep > max)
+                sweep = max;
 
             if (mDegreeStartTime == mDegreeCurrentTime)
                 sweep = 1;
 
-
-            Log.i(TAG, "onDraw: mDegreeStartTime : " + mDegreeStartTime);
-            Log.i(TAG, "onDraw: mDegreeEndTime : " + mDegreeEndTime);
-            Log.i(TAG, "onDraw: mDegreeCurrentTime : " + mDegreeCurrentTime);
-            Log.i(TAG, "onDraw: sweep : " + sweep);
-            Log.i(TAG, "onDraw: start : " + start);
-            Log.i(TAG, "onDraw: end : " + end);
-
-
-/*
-            if (end < mDegreeCurrentTime)
-                mDegreeCurrentTime = end;
-*/
-
+            //PROGRESS TIME
             canvas.drawArc(mRectProgress, mDegreeStartTime, sweep, false, mPaintTimeProgress);        //PROGRESS
 
 

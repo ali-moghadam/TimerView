@@ -7,7 +7,7 @@
     tools:context=".IndicatorActivity">
 
     <com.alirnp.alichtimerview.AliChTimerView
-        android:id="@+id/aliTimerViewIndicator"
+        android:id="@+id/indicator_aliTimerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/_40sdp"
@@ -22,11 +22,21 @@
         app:atv_stroke_width_circles="@dimen/_2sdp"
         app:atv_text_center="03:00"
         app:atv_text_status="Reaming time"
-        app:atv_value_end_time_hour="1"
+        app:atv_value_end_time_hour="6"
         app:atv_value_repeat_start_hour="12"
-        app:atv_value_start_time_hour="10"
+        app:atv_value_start_time_hour="11"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/indicator_textView_startTime"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="@dimen/_16sdp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/indicator_aliTimerView"
+        tools:text="start time : 12:22" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

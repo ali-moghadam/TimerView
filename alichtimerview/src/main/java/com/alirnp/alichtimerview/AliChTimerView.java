@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -17,7 +18,10 @@ import androidx.annotation.IntRange;
 import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class AliChTimerView extends View {
 
@@ -35,11 +39,14 @@ public class AliChTimerView extends View {
     private final static int DEFAULT_REPEAT_COLOR = Color.parseColor("#FDD835");
     private final static int DEFAULT_TEXT_TIME_COLOR = Color.parseColor("#2196F3");
     private static float DEFAULT_SPACE_TEXT = dpToPx(45);
+
     private Context context;
+
     private float mDegreeStartTime;
     private float mDegreeEndTime;
     private float mDegreeLeftTime;
     private float mDegreeStartRepeatTime;
+    private float mDegreeCurrentTime;
 
     private float mRadiusBackgroundProgress;
     private float mRadiusBackgroundRepeat;
@@ -89,7 +96,6 @@ public class AliChTimerView extends View {
     private float mFloatCenterXCircleStartRepeat;
     private float mFloatCenterYCircleStartRepeat;
 
-
     private float mFloatLengthOfClockLines;
     private float mFloatBeginOfClockLines;
 
@@ -98,7 +104,11 @@ public class AliChTimerView extends View {
 
     private List<CircleArea> mCircles = new ArrayList<>();
     private CircleArea circleArea = new CircleArea();
+
     private CircleID currentCircleIDForMove;
+    private AM_PM mAmPmStart = AM_PM.AM;
+    private AM_PM mAmPmEnd = AM_PM.AM;
+
     int tempHour = -1;
 
     private boolean accessMoving;
@@ -242,6 +252,15 @@ public class AliChTimerView extends View {
                 mStringTextStatus = a.getString(R.styleable.AliChTimerView_atv_text_status);
                 if (mStringTextStatus == null)
                     mStringTextStatus = DEFAULT_TEXT_STATUS;
+
+
+                Calendar cal = Calendar.getInstance(TimeZone.getTimeZone("Asia/Tehran"));
+                cal.setTime(new Date());
+                int hour = cal.get(Calendar.HOUR);
+                int minute = cal.get(Calendar.MINUTE);
+                String mStringAmPm = cal.get(Calendar.AM_PM) == Calendar.AM ? "AM" : "PM";
+
+                mDegreeCurrentTime = calculateDegreeFromHour(hour, minute);
 
 
             } finally {
@@ -452,16 +471,41 @@ public class AliChTimerView extends View {
         if (isIndicator) {
 
             //PROGRESS TIME
-            canvas.drawArc(mRectProgress, mDegreeStartTime, mDegreeLeftTime, false, mPaintTimeProgress);        //PROGRESS
+            float sweep;
+            float temp;
+
+            temp = mDegreeStartTime;
+            if (temp > mDegreeCurrentTime)
+                temp = mDegreeCurrentTime;
+            float start = (mDegreeStartTime < temp) ? temp - mDegreeStartTime : 360 - mDegreeStartTime + temp;
+
+            float end = (mDegreeEndTime > mDegreeStartTime) ? mDegreeEndTime - mDegreeStartTime : 360 - mDegreeStartTime + mDegreeEndTime;
 
 
-            /*//PROGRESS REPEAT TIME
-            float temp = mDegreeStartRepeatTime;
-            if (temp > mDegreeEndRepeatTime)
-                temp = mDegreeEndRepeatTime;
-            mFloatSweepAngelRepeat = (mDegreeStartRepeatTime < temp) ? temp - mDegreeStartRepeatTime : 360 - mDegreeStartRepeatTime + temp;
-            */
-            canvas.drawArc(mRectRepeatProgress, mDegreeStartRepeatTime, 15, false, mPaintRepeatProgress);
+            sweep = (mDegreeCurrentTime > mDegreeStartTime) ? mDegreeCurrentTime - mDegreeStartTime : 360 - (mDegreeStartTime - mDegreeCurrentTime);
+
+            if (mDegreeStartTime == mDegreeCurrentTime)
+                sweep = 1;
+
+
+            Log.i(TAG, "onDraw: mDegreeStartTime : " + mDegreeStartTime);
+            Log.i(TAG, "onDraw: mDegreeEndTime : " + mDegreeEndTime);
+            Log.i(TAG, "onDraw: mDegreeCurrentTime : " + mDegreeCurrentTime);
+            Log.i(TAG, "onDraw: sweep : " + sweep);
+            Log.i(TAG, "onDraw: start : " + start);
+            Log.i(TAG, "onDraw: end : " + end);
+
+
+/*
+            if (end < mDegreeCurrentTime)
+                mDegreeCurrentTime = end;
+*/
+
+            canvas.drawArc(mRectProgress, mDegreeStartTime, sweep, false, mPaintTimeProgress);        //PROGRESS
+
+
+            //PROGRESS REPEAT TIME
+            canvas.drawArc(mRectRepeatProgress, mDegreeStartRepeatTime, 10, false, mPaintRepeatProgress);
 
         }
 
@@ -539,7 +583,9 @@ public class AliChTimerView extends View {
         this.mStartTimeHour = hour;
 
         int degreeOfPerHour = 30;
-        mDegreeStartTime = ((mStartTimeHour * 360) / 12) + ((mStartTimeMinute * degreeOfPerHour) / 60);
+        int degreeOfHour = ((mStartTimeHour * 360) / 12);
+        int degreeOfMinute = ((mStartTimeMinute * degreeOfPerHour) / 60);
+        mDegreeStartTime = degreeOfHour + degreeOfMinute;
 
         invalidate();
     }
@@ -614,7 +660,6 @@ public class AliChTimerView extends View {
 
     public void setRepeatStartHour(int hour) {
 
-
         hour = rotateHour(hour);
         hour = validateHour(hour);
         this.mRepeatStartHour = validateHour(hour);
@@ -637,6 +682,16 @@ public class AliChTimerView extends View {
     public void setShowRepeat(boolean show) {
         isShowRepeat = show;
         invalidate();
+    }
+
+    private float calculateDegreeFromHour(int hour, int minute) {
+        hour = hour - 3;
+        int degreeOfPerHour = 30;
+        int degreeOfHour = ((hour * 360) / 12);
+        int degreeOfMinute = ((minute * degreeOfPerHour) / 60);
+        degreeOfMinute = 0;
+        //todo add minute :D
+        return degreeOfHour + degreeOfMinute;
     }
 
 
@@ -680,7 +735,6 @@ public class AliChTimerView extends View {
         return (hour * 360) / 12;
     }
 
-    private AM_PM amPm = AM_PM.AM;
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -691,10 +745,8 @@ public class AliChTimerView extends View {
         int hour;
         int minute;
 
-
         int x = (int) event.getX();
         int y = (int) event.getY();
-
 
         double angel;
 
@@ -726,25 +778,30 @@ public class AliChTimerView extends View {
                     hour = getHourFromAngel(angel);
                     minute = getMinuteFromAngel(angel);
 
+                    changeAmPm(hour, tempHour);
+                    tempHour = hour;
+
                     switch (currentCircleIDForMove) {
                         case CIRCLE_START_TIME:
                             mDegreeStartTime = (float) angel;
 
+                            if (onSeekCirclesListener != null)
+                                onSeekCirclesListener.OnSeekChange(currentCircleIDForMove, mAmPmStart, hour, minute);
+
                             break;
                         case CIRCLE_END_TIME:
                             mDegreeEndTime = (float) angel;
+                            if (onSeekCirclesListener != null)
+                                onSeekCirclesListener.OnSeekChange(currentCircleIDForMove, mAmPmEnd, hour, minute);
 
                             break;
                         case CIRCLE_REPEAT_TIME:
                             mDegreeStartRepeatTime = (float) angel;
+                            if (onSeekCirclesListener != null)
+                                onSeekCirclesListener.OnSeekChange(currentCircleIDForMove, AM_PM.NONE, hour, minute);
                             break;
                     }
 
-                    changeAmPm(hour, tempHour);
-                    tempHour = hour;
-
-                    if (onSeekCirclesListener != null)
-                        onSeekCirclesListener.OnSeekChange(currentCircleIDForMove, amPm, hour, minute);
                     invalidate();
                 }
                 break;
@@ -752,7 +809,21 @@ public class AliChTimerView extends View {
 
                 if (onSeekCirclesListener != null) {
                     angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
-                    onSeekCirclesListener.OnSeekComplete(currentCircleIDForMove, getHourFromAngel(angel), getMinuteFromAngel(angel));
+
+                    switch (currentCircleIDForMove) {
+                        case CIRCLE_START_TIME:
+                            onSeekCirclesListener.OnSeekComplete(currentCircleIDForMove, mAmPmStart, getHourFromAngel(angel), getMinuteFromAngel(angel));
+                            break;
+
+                        case CIRCLE_END_TIME:
+                            onSeekCirclesListener.OnSeekComplete(currentCircleIDForMove, mAmPmEnd, getHourFromAngel(angel), getMinuteFromAngel(angel));
+                            break;
+
+                        case CIRCLE_REPEAT_TIME:
+                            onSeekCirclesListener.OnSeekComplete(currentCircleIDForMove, AM_PM.NONE, getHourFromAngel(angel), getMinuteFromAngel(angel));
+                            break;
+                    }
+
                 }
                 accessMoving = false;
                 currentCircleIDForMove = CircleID.NONE;
@@ -779,10 +850,25 @@ public class AliChTimerView extends View {
     }
 
     private void revertAmPm() {
-        if (amPm == AM_PM.AM)
-            amPm = AM_PM.PM;
-        else
-            amPm = AM_PM.AM;
+        switch (currentCircleIDForMove) {
+            case CIRCLE_START_TIME:
+
+                if (mAmPmStart == AM_PM.AM)
+                    mAmPmStart = AM_PM.PM;
+                else
+                    mAmPmStart = AM_PM.AM;
+                break;
+
+            case CIRCLE_END_TIME:
+
+                if (mAmPmEnd == AM_PM.AM)
+                    mAmPmEnd = AM_PM.PM;
+                else
+                    mAmPmEnd = AM_PM.AM;
+
+                break;
+        }
+
     }
 
     private int getHourFromAngel(double angel) {
@@ -821,8 +907,8 @@ public class AliChTimerView extends View {
         return getPaddingLeft() + getPaddingRight();
     }
 
-    public void setAmPm(AM_PM amPm) {
-        this.amPm = amPm;
+    public void setmAmPmStart(AM_PM mAmPmStart) {
+        this.mAmPmStart = mAmPmStart;
     }
 
     @Override
@@ -855,6 +941,7 @@ public class AliChTimerView extends View {
     }
 
     public enum AM_PM {
+        NONE,
         AM,
         PM
     }

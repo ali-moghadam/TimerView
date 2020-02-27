@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".IndicatorActivity">
+
+    <com.alirnp.alichtimerview.AliChTimerView
+        android:id="@+id/aliTimerViewIndicator"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/_40sdp"
+        android:layout_marginEnd="@dimen/_40sdp"
+        app:atv_color_background_progress="#F5F5F5"
+        app:atv_color_end_time_stroke="#f44336"
+        app:atv_color_progress="#00E676"
+        app:atv_color_repeat_stroke="#FBC02D"
+        app:atv_color_start_time_stroke="#1E88E5"
+        app:atv_is_indicator="true"
+        app:atv_stroke_width_background_progress="@dimen/_10sdp"
+        app:atv_stroke_width_circles="@dimen/_2sdp"
+        app:atv_text_center="03:00"
+        app:atv_text_status="Reaming time"
+        app:atv_value_end_time_hour="6"
+        app:atv_value_left_time_hour="-1"
+        app:atv_value_repeat_start_hour="10"
+        app:atv_value_start_time_hour="7"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

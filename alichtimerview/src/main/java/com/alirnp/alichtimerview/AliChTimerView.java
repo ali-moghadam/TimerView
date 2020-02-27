@@ -10,7 +10,6 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -530,13 +529,6 @@ public class AliChTimerView extends View {
         if (mDegreeStartTime == mDegreeCurrentTime)
             sweep = 1;
 
-
-        Log.i(TAG, "mDegreeStartTime: " + (int) mDegreeStartTime);
-        Log.i(TAG, "mDegreeEndTime: " + (int) mDegreeEndTime);
-        Log.i(TAG, "mDegreeCurrentTime: " + (int) mDegreeCurrentTime);
-        Log.i(TAG, "max: " + (int) max);
-        Log.i(TAG, "sweep: " + (int) sweep);
-
         return sweep;
     }
 
@@ -670,6 +662,7 @@ public class AliChTimerView extends View {
 
 
     private int rotateHour(int hour) {
+
         if (hour <= 3)
             hour = hour + 9;
         else
@@ -679,8 +672,9 @@ public class AliChTimerView extends View {
     }
 
     private int rotateHourRevert(int hour) {
-        if (hour <= 3)
+        if (hour <= 9)
             hour = hour + 3;
+
         else
             hour = (hour + 3) - 12;
 

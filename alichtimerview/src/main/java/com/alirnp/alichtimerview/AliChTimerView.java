@@ -109,6 +109,7 @@ public class AliChTimerView extends View {
     private boolean accessMoving;
     private boolean isIndicator;
     private boolean isShowRepeat;
+    private boolean isShowProgress = true;
 
     private OnSeekCirclesListener onSeekCirclesListener;
     private OnMoveListener onMoveListener;
@@ -204,6 +205,10 @@ public class AliChTimerView extends View {
         this.mStringTextStatus = status;
     }
 
+    public void setIsShowProgress(boolean isShow) {
+        this.isShowProgress = isShow;
+    }
+
     private void init(AttributeSet attrs) {
 
         mStringTextCenter = DEFAULT_TEXT_TIME;
@@ -220,10 +225,7 @@ public class AliChTimerView extends View {
 
                 setEndTimeHour(a.getInteger(R.styleable.AliChTimerView_atv_value_end_time_hour, 7));
                 setEndTimeMinute(a.getInteger(R.styleable.AliChTimerView_atv_value_end_time_minute, 0));
-/*
-                setLeftTimeHour(a.getInteger(R.styleable.AliChTimerView_atv_value_left_time_hour, 0));
-                setLeftTimeMinute(a.getInteger(R.styleable.AliChTimerView_atv_value_left_time_minute, 0));
-*/
+
                 setRepeatStartHour(a.getInteger(R.styleable.AliChTimerView_atv_value_repeat_start_hour, 0));
 
                 isIndicator = a.getBoolean(R.styleable.AliChTimerView_atv_is_indicator, true);
@@ -424,7 +426,8 @@ public class AliChTimerView extends View {
             mRadiusBackgroundProgress = DEFAULT_BACKGROUND_PROGRESS_RADIUS;
         }
 
-        setMeasuredDimension(mWidthBackgroundProgress, mHeightBackgroundProgress);
+        int length = Math.min(mWidthBackgroundProgress, mHeightBackgroundProgress);
+        setMeasuredDimension(length, length);
     }
 
     @Override
@@ -462,7 +465,8 @@ public class AliChTimerView extends View {
             float sweep = getSweepProgressArc();
 
             //PROGRESS TIME
-            canvas.drawArc(mRectProgress, mDegreeStartTime, sweep, false, mPaintTimeProgress);
+            if (isShowProgress)
+                canvas.drawArc(mRectProgress, mDegreeStartTime, sweep, false, mPaintTimeProgress);
 
             //PROGRESS REPEAT TIME
             canvas.drawArc(mRectRepeatProgress, mDegreeStartRepeatTime, 10, false, mPaintRepeatProgress);
@@ -477,7 +481,6 @@ public class AliChTimerView extends View {
             canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) + DEFAULT_SPACE_TEXT, mPaintTextTime);
 
         }
-
 
 
         //CIRCLE START TIME
@@ -635,12 +638,26 @@ public class AliChTimerView extends View {
         invalidate();
     }
 
-    public void setAmPmStart(AM_PM amPm) {
+    public void setStartAmPm(AM_PM amPm) {
         this.mAmPmStart = amPm;
     }
 
-    public void setAmPmEnd(AM_PM amPm) {
+    public void setStartAmPm(String amPm) {
+        if (amPm.equalsIgnoreCase("pm"))
+            this.mAmPmStart = AM_PM.PM;
+        else
+            this.mAmPmStart = AM_PM.AM;
+    }
+
+    public void setEndAmPm(AM_PM amPm) {
         this.mAmPmEnd = amPm;
+    }
+
+    public void setEndAmPm(String amPm) {
+        if (amPm.equalsIgnoreCase("pm"))
+            this.mAmPmEnd = AM_PM.PM;
+        else
+            this.mAmPmEnd = AM_PM.AM;
     }
 
     public String getStartTime() {
@@ -662,7 +679,6 @@ public class AliChTimerView extends View {
 
 
     private int rotateHour(int hour) {
-
         if (hour <= 3)
             hour = hour + 9;
         else
@@ -984,4 +1000,3 @@ public class AliChTimerView extends View {
     }
 
 }
-

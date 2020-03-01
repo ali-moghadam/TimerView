@@ -8,8 +8,9 @@
 
     <com.alirnp.alichtimerview.AliChTimerView
         android:id="@+id/indicator_aliTimerView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="@dimen/_220sdp"
+        android:layout_height="@dimen/_220sdp"
+        android:layout_marginTop="@dimen/_20sdp"
         android:layout_marginStart="@dimen/_40sdp"
         android:layout_marginEnd="@dimen/_40sdp"
         app:atv_color_background_progress="#F5F5F5"
@@ -37,6 +38,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/indicator_aliTimerView"
+        android:layout_marginTop="@dimen/_20sdp"
         tools:text="start time : 12:22" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,33 +1,381 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.example.alichchartview.Need.LockableScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/flexible_scrollView"
     tools:context=".FlexibleActivity">
 
-    <com.alirnp.alichtimerview.AliChTimerView
-        android:id="@+id/aliTimerViewIndicator"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/_40sdp"
-        android:layout_marginEnd="@dimen/_40sdp"
-        app:atv_color_background_progress="#F5F5F5"
-        app:atv_color_end_time_stroke="#f44336"
-        app:atv_color_progress="#00E676"
-        app:atv_color_repeat_stroke="#FBC02D"
-        app:atv_color_start_time_stroke="#1E88E5"
-        app:atv_is_indicator="false"
-        app:atv_stroke_width_background_progress="@dimen/_14sdp"
-        app:atv_stroke_width_circles="@dimen/_2sdp"
-        app:atv_text_center="03:00"
-        app:atv_text_status=""
-        app:atv_value_end_time_hour="6"
-        app:atv_value_left_time_hour="4"
-        app:atv_value_repeat_start_hour="0"
-        app:atv_value_start_time_hour="0"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        android:layout_height="0dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <com.alirnp.alichtimerview.AliChTimerView
+            android:id="@+id/flexible_aliTimerViewIndicator"
+            android:layout_width="@dimen/_220sdp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_20sdp"
+            app:atv_color_background_progress="#F5F5F5"
+            app:atv_color_end_time_stroke="#f44336"
+            app:atv_color_progress="#00E676"
+            app:atv_color_repeat_stroke="#FBC02D"
+            app:atv_color_start_time_stroke="#1E88E5"
+            app:atv_is_indicator="false"
+            app:atv_stroke_width_background_progress="@dimen/_14sdp"
+            app:atv_stroke_width_circles="@dimen/_2sdp"
+            app:atv_text_center="03:00"
+            app:atv_text_status=""
+            app:atv_value_end_time_hour="6"
+            app:atv_value_left_time_hour="4"
+            app:atv_value_repeat_start_hour="0"
+            app:atv_value_start_time_hour="0"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/flexible_constraintLayout_startTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:padding="@dimen/_19sdp"
+            app:layout_constraintTop_toBottomOf="@+id/flexible_aliTimerViewIndicator">
+
+
+            <View
+                android:id="@+id/flexible_view_startTime"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_marginLeft="@dimen/_7sdp"
+                android:layout_marginRight="@dimen/_7sdp"
+                android:background="@drawable/shape_circle_blue"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_startTime"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_startTime" />
+
+            <TextView
+                android:id="@+id/flexible_textView_startTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="@string/start_time"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/flexible_view_startTime"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/flexible_textView_startTimeAmPM"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginLeft="@dimen/_24sdp"
+                android:layout_marginRight="@dimen/_24sdp"
+                android:fontFamily="@font/roboto_medium_italic"
+                android:gravity="center"
+                android:text="@string/am"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/flexible_textView_startTimeMinute"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_italic"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_startTimeHour"
+                app:layout_constraintEnd_toStartOf="@+id/flexible_textView_startTimeAmPM"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_startTimeHour"
+                tools:text="00" />
+
+            <TextView
+                android:id="@+id/flexible_textView_startTimeSplit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/hour_split"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_startTimeMinute"
+                app:layout_constraintEnd_toStartOf="@+id/flexible_textView_startTimeMinute"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_startTimeMinute" />
+
+            <TextView
+                android:id="@+id/flexible_textView_startTimeHour"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_italic"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_startTime"
+                app:layout_constraintEnd_toStartOf="@id/flexible_textView_startTimeSplit"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_startTime"
+                tools:text="00" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/flexible_view_lineBetweenTimes"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginLeft="@dimen/_12sdp"
+            android:layout_marginRight="@dimen/_12sdp"
+            android:background="#EEEEEE"
+            app:layout_constraintTop_toBottomOf="@id/flexible_constraintLayout_startTime" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/flexible_constraintLayout_endTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="@dimen/_19sdp"
+            app:layout_constraintTop_toBottomOf="@+id/flexible_view_lineBetweenTimes">
+
+
+            <View
+                android:id="@+id/flexible_view_endTime"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_marginLeft="@dimen/_7sdp"
+                android:layout_marginRight="@dimen/_7sdp"
+                android:background="@drawable/shape_circle_red"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_endTime"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_endTime" />
+
+            <TextView
+                android:id="@+id/flexible_textView_endTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="@string/end_time"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/flexible_view_endTime"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/flexible_textView_endTimeAmPM"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginLeft="@dimen/_24sdp"
+                android:layout_marginRight="@dimen/_24sdp"
+                android:fontFamily="@font/roboto_medium_italic"
+                android:gravity="center"
+                android:text="@string/am"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/flexible_textView_endTimeMinute"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_italic"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_endTimeHour"
+                app:layout_constraintEnd_toStartOf="@+id/flexible_textView_endTimeAmPM"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_endTimeHour"
+                tools:text="00" />
+
+            <TextView
+                android:id="@+id/flexible_textView_endTimeSplit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/hour_split"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_endTimeMinute"
+                app:layout_constraintEnd_toStartOf="@+id/flexible_textView_endTimeMinute"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_endTimeMinute" />
+
+            <TextView
+                android:id="@+id/flexible_textView_endTimeHour"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_italic"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_endTime"
+                app:layout_constraintEnd_toStartOf="@id/flexible_textView_endTimeSplit"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_endTime"
+                tools:text="00" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:id="@+id/flexible_view_lineBetweenRepeat"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginLeft="@dimen/_12sdp"
+            android:layout_marginRight="@dimen/_12sdp"
+            android:background="#EEEEEE"
+            app:layout_constraintTop_toBottomOf="@id/flexible_constraintLayout_endTime" />
+
+
+        <androidx.appcompat.widget.AppCompatImageView
+            android:id="@+id/flexible_image_view_repeat"
+            android:layout_width="@dimen/_20sdp"
+            android:layout_height="0dp"
+            android:layout_marginLeft="@dimen/_19sdp"
+            android:layout_marginRight="@dimen/_19sdp"
+            app:layout_constraintBottom_toBottomOf="@id/flexible_text_view_repeat"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintTop_toTopOf="@id/flexible_text_view_repeat" />
+
+        <TextView
+            android:id="@+id/flexible_text_view_repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:fontFamily="@font/segoe_ui_bold"
+            android:gravity="center"
+            android:text="@string/periodic_repeat"
+            android:textSize="@dimen/_12sdp"
+            app:layout_constraintBottom_toBottomOf="@+id/flexible_switch_repeat"
+            app:layout_constraintLeft_toRightOf="@id/flexible_image_view_repeat"
+            app:layout_constraintTop_toTopOf="@+id/flexible_switch_repeat" />
+
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/flexible_switch_repeat"
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_marginLeft="@dimen/_36sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_marginRight="@dimen/_36sdp"
+
+            app:layout_constraintRight_toRightOf="@id/flexible_constraintLayout_endTime"
+            app:layout_constraintTop_toTopOf="@id/flexible_view_lineBetweenRepeat"
+            app:switchMinWidth="65dp"
+
+            tools:checked="true" />
+
+
+        <View
+            android:id="@+id/flexible_view_lineBetweenRepeatTime"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/_1sdp"
+            android:layout_marginLeft="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:layout_marginRight="@dimen/_12sdp"
+            android:background="#EEEEEE"
+            app:layout_constraintTop_toBottomOf="@id/flexible_switch_repeat" />
+
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/flexible_constraintLayout_repeatTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_12sdp"
+            android:padding="@dimen/_19sdp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/flexible_view_lineBetweenRepeatTime"
+            app:layout_constraintVertical_bias="0">
+
+
+            <View
+                android:id="@+id/flexible_view_repeatTime"
+                android:layout_width="@dimen/_20sdp"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_marginLeft="@dimen/_7sdp"
+                android:layout_marginRight="@dimen/_7sdp"
+                android:background="@drawable/shape_circle_orange"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_repeatTime"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_repeatTime" />
+
+            <TextView
+                android:id="@+id/flexible_textView_repeatTime"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/_10sdp"
+                android:layout_marginRight="@dimen/_10sdp"
+                android:fontFamily="@font/roboto_bold"
+                android:gravity="center"
+                android:text="@string/repeat_after"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintLeft_toRightOf="@id/flexible_view_repeatTime"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/flexible_textView_repeatTimeAmPM"
+                android:layout_width="wrap_content"
+                android:layout_height="0dp"
+                android:layout_marginLeft="@dimen/_24sdp"
+                android:layout_marginRight="@dimen/_24sdp"
+                android:fontFamily="@font/roboto_medium_italic"
+                android:gravity="center"
+                android:text="@string/am"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/_15sdp"
+                android:visibility="invisible"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <TextView
+                android:id="@+id/flexible_textView_repeatTimeMinute"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_italic"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_repeatTimeHour"
+                app:layout_constraintEnd_toStartOf="@+id/flexible_textView_repeatTimeAmPM"
+                app:layout_constraintHorizontal_bias="0.1"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_repeatTimeHour"
+                tools:text="00" />
+
+            <TextView
+                android:id="@+id/flexible_textView_repeatTimeSplit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_bold"
+                android:text="@string/hour_split"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_repeatTimeMinute"
+                app:layout_constraintEnd_toStartOf="@+id/flexible_textView_repeatTimeMinute"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_repeatTimeMinute" />
+
+            <TextView
+                android:id="@+id/flexible_textView_repeatTimeHour"
+                android:layout_width="@dimen/_35sdp"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/roboto_italic"
+                android:gravity="center"
+                android:textColor="@color/colorPrimary"
+                android:textSize="@dimen/_15sdp"
+                app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_repeatTime"
+                app:layout_constraintEnd_toStartOf="@id/flexible_textView_repeatTimeSplit"
+                app:layout_constraintTop_toTopOf="@+id/flexible_textView_repeatTime"
+                tools:text="00" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+</com.example.alichchartview.Need.LockableScrollView>

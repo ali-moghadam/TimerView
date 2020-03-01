@@ -2,4 +2,10 @@
     <string name="app_name">AliChTimerView</string>
     <string name="flexible">Flexible</string>
     <string name="indicator">Indicator</string>
+    <string name="start_time">Start Time</string>
+    <string name="am">AM</string>
+    <string name="hour_split">:</string>
+    <string name="end_time">End Time</string>
+    <string name="periodic_repeat">Repeat</string>
+    <string name="repeat_after">Repeat After</string>
 </resources>

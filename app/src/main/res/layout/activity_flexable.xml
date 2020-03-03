@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/flexible_scrollView"
+    android:fillViewport="true"
     tools:context=".FlexibleActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -18,7 +19,6 @@
             android:layout_marginTop="@dimen/_20sdp"
             app:atv_color_background_progress="#F5F5F5"
             app:atv_color_end_time_stroke="#f44336"
-            app:atv_color_progress="#00E676"
             app:atv_color_repeat_stroke="#FBC02D"
             app:atv_color_start_time_stroke="#1E88E5"
             app:atv_is_indicator="false"
@@ -97,7 +97,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/flexible_textView_startTimeAmPM"
                 app:layout_constraintHorizontal_bias="0.1"
                 app:layout_constraintTop_toTopOf="@+id/flexible_textView_startTimeHour"
-                tools:text="00" />
+                android:text="@string/_00" />
 
             <TextView
                 android:id="@+id/flexible_textView_startTimeSplit"
@@ -121,7 +121,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_startTime"
                 app:layout_constraintEnd_toStartOf="@id/flexible_textView_startTimeSplit"
                 app:layout_constraintTop_toTopOf="@+id/flexible_textView_startTime"
-                tools:text="00" />
+                android:text="@string/_00" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
@@ -194,7 +194,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/flexible_textView_endTimeAmPM"
                 app:layout_constraintHorizontal_bias="0.1"
                 app:layout_constraintTop_toTopOf="@+id/flexible_textView_endTimeHour"
-                tools:text="00" />
+                android:text="@string/_00" />
 
             <TextView
                 android:id="@+id/flexible_textView_endTimeSplit"
@@ -218,7 +218,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_endTime"
                 app:layout_constraintEnd_toStartOf="@id/flexible_textView_endTimeSplit"
                 app:layout_constraintTop_toTopOf="@+id/flexible_textView_endTime"
-                tools:text="00" />
+                android:text="@string/_00" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <View
@@ -347,7 +347,7 @@
                 app:layout_constraintEnd_toStartOf="@+id/flexible_textView_repeatTimeAmPM"
                 app:layout_constraintHorizontal_bias="0.1"
                 app:layout_constraintTop_toTopOf="@+id/flexible_textView_repeatTimeHour"
-                tools:text="00" />
+                android:text="@string/_00" />
 
             <TextView
                 android:id="@+id/flexible_textView_repeatTimeSplit"
@@ -371,7 +371,7 @@
                 app:layout_constraintBottom_toBottomOf="@+id/flexible_textView_repeatTime"
                 app:layout_constraintEnd_toStartOf="@id/flexible_textView_repeatTimeSplit"
                 app:layout_constraintTop_toTopOf="@+id/flexible_textView_repeatTime"
-                tools:text="00" />
+                android:text="@string/_00" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 

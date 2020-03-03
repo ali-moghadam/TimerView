@@ -8,4 +8,5 @@
     <string name="end_time">End Time</string>
     <string name="periodic_repeat">Repeat</string>
     <string name="repeat_after">Repeat After</string>
+    <string name="_00">00</string>
 </resources>

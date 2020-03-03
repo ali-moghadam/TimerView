@@ -7,4 +7,12 @@ public class Utils {
         else
             return String.valueOf(time);
     }
+
+    public static String addZeroBeforeTime(String time) {
+        int timeInt = Integer.parseInt(time);
+        if (timeInt <= 9)
+            return "0" + timeInt;
+        else
+            return time;
+    }
 }

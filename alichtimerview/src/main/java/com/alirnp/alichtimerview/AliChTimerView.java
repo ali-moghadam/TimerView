@@ -669,6 +669,10 @@ public class AliChTimerView extends View {
         return addZeroBeforeTime(rotateHourRevert(mEndTimeHour)) + ":" + addZeroBeforeTime(mEndTimeMinute);
     }
 
+    public String getRepeatTime() {
+        return addZeroBeforeTime(rotateHourRevert(mRepeatStartHour)) + ":" + addZeroBeforeTime(mRepeatStartMinute);
+    }
+
     private float calculateDegreeFromHour(int hour, int minute) {
         hour = rotateHour(hour);
         int degreeOfPerHour = 30;

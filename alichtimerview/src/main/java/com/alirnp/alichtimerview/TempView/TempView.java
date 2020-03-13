@@ -14,7 +14,6 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
-import androidx.annotation.IntRange;
 import androidx.annotation.Nullable;
 
 import com.alirnp.alichtimerview.R;
@@ -23,8 +22,6 @@ import com.alirnp.alichtimerview.TimeView.OnMoveListener;
 import com.alirnp.alichtimerview.TimeView.OnSeekCirclesListener;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class TempView extends View {
@@ -37,7 +34,7 @@ public class TempView extends View {
     private final static float DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH = dpToPx(20);
     private final static float DEFAULT_CIRCLE_STROKE_WIDTH = 5;
     private final static int DEFAULT_PROGRESS_COLOR = Color.parseColor("#1a8dff");
-    private final static int DEFAULT_START_TIME_STROKE_COLOR = Color.parseColor("#ffffff");
+    private final static int DEFAULT_START_TIME_STROKE_COLOR = Color.parseColor("#00E676");
     private final static int DEFAULT_CLOCK_COLOR = Color.parseColor("#CFD8DC");
     private final static int DEFAULT_TEXT_TIME_COLOR = Color.parseColor("#2196F3");
     private static float DEFAULT_SPACE_TEXT = dpToPx(45);
@@ -45,8 +42,7 @@ public class TempView extends View {
     private final static int DEFAULT_MAX_VALUE = 14;
     int tempHour = -1;
     private Context context;
-    private float mDegreeStartTime;
-    private float mDegreeCurrentTime;
+    private float mDegreeValue;
     private float mRadiusBackgroundProgress;
     private float mStrokeWithBackgroundProgress;
     private float mStrokeWithCircles;
@@ -54,7 +50,7 @@ public class TempView extends View {
     private int mColorBackgroundProgress;
     private int mColorStartTime;
     private int mColorTextTime;
-    private int mStartTimeHour;
+    private int mIntegerValue;
     private String mStringTextCenter;
     private String mStringTextStatus;
     private Paint mPaintBackgroundProgress;
@@ -79,7 +75,6 @@ public class TempView extends View {
     private OnMoveListener onMoveListener;
     private boolean accessMoving;
     private boolean isIndicator;
-    private boolean isShowProgress = true;
     private static final String TAG = "TempViewLog";
     private int mIntegerMinValue;
     private int mIntegerMaxValue;
@@ -158,9 +153,6 @@ public class TempView extends View {
         this.mStringTextStatus = status;
     }
 
-    public void setIsShowProgress(boolean isShow) {
-        this.isShowProgress = isShow;
-    }
 
     private void init(AttributeSet attrs) {
 
@@ -172,8 +164,6 @@ public class TempView extends View {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TempView, 0, 0);
 
             try {
-
-                setStartTimeHour(a.getInteger(R.styleable.TempView_tv_value_start_time_hour, 0));
 
                 isIndicator = a.getBoolean(R.styleable.TempView_tv_is_indicator, true);
 
@@ -195,15 +185,11 @@ public class TempView extends View {
                     mStringTextStatus = DEFAULT_TEXT_STATUS;
 
 
-                Calendar cal = Calendar.getInstance();
-                cal.setTime(new Date());
-                int hour = cal.get(Calendar.HOUR);
-                int minute = cal.get(Calendar.MINUTE);
-
-                mDegreeCurrentTime = calculateDegreeFromHour(hour, minute);
-
                 mIntegerMinValue = a.getInteger(R.styleable.TempView_tv_min_value, DEFAULT_MIN_VALUE);
                 mIntegerMaxValue = a.getInteger(R.styleable.TempView_tv_max_value, DEFAULT_MAX_VALUE);
+
+                setCurrentValue(a.getInteger(R.styleable.TempView_tv_current_value, 0));
+
 
 
             } finally {
@@ -352,8 +338,8 @@ public class TempView extends View {
 
         mCircles.clear();
 
-        mFloatCenterXCircleStartTime = getDrawXOnBackgroundProgress(mDegreeStartTime, mRadiusBackgroundProgress, mWidthBackgroundProgress);
-        mFloatCenterYCircleStartTime = getDrawYOnBackgroundProgress(mDegreeStartTime, mRadiusBackgroundProgress, mHeightBackgroundProgress);
+        mFloatCenterXCircleStartTime = getDrawXOnBackgroundProgress(mDegreeValue, mRadiusBackgroundProgress, mWidthBackgroundProgress);
+        mFloatCenterYCircleStartTime = getDrawYOnBackgroundProgress(mDegreeValue, mRadiusBackgroundProgress, mHeightBackgroundProgress);
         //ADD CIRCLE AREA FOR DETECT TOUCH
         mCircles.add(injectCircleArea(AliChTimerView.CircleID.CIRCLE_START_TIME, mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth()));
 
@@ -362,55 +348,35 @@ public class TempView extends View {
         canvas.drawCircle(mWidthBackgroundProgress / 2, mHeightBackgroundProgress / 2, mRadiusBackgroundProgress, mPaintBackgroundProgress);
 
 
-        if (isIndicator) {
-
-            float sweep = getSweepProgressArc();
-
-            //PROGRESS TIME
-            if (isShowProgress)
-                canvas.drawArc(mRectProgress, mDegreeStartTime, sweep, false, mPaintTimeProgress);
+        float sweep = getSweepProgressArc();
+        //PROGRESS TIME
+        canvas.drawArc(mRectProgress, 270, sweep, false, mPaintTimeProgress);
 
 
-            //TEXT
-            canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) + DEFAULT_SPACE_TEXT, mPaintTextTime);
-            canvas.drawText(mStringTextStatus, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) - DEFAULT_SPACE_TEXT, mPaintTextReaming);
-
-
-        } else {
-            //TEXT
-            canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) + DEFAULT_SPACE_TEXT, mPaintTextTime);
-
-        }
+        //TEXT
+        canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) + DEFAULT_SPACE_TEXT, mPaintTextTime);
+        canvas.drawText(mStringTextStatus, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) - DEFAULT_SPACE_TEXT, mPaintTextReaming);
 
 
         //CIRCLE START TIME
-
         canvas.drawCircle(mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth() / 2, mPaintStartTime);
 
-
-        //CLOCK LINES
+        //LINES
         float angel = 270;
         float x1, y1, x2, y2;
 
-        int left = (mIntegerMaxValue - mIntegerMinValue);
-        int count = left % 2 == 0 ? left : left + 1;
-        float degreePerValue = 360 / (float) count;
-
-        //Log.i(TAG, String.format("\t count=%d \t degree=%d"+count,degreePerValue));
-        Log.i(TAG, "count:" + count + "\tdegree:" + degreePerValue);
-
+        int count = getHandCount();
+        float degreePerHand = getDegreePerHand();
 
         for (int i = 0; i < count; i++) {
 
-
-            angel += degreePerValue;
+            angel += degreePerHand;
 
             if (i % 2 != 0) {
                 x1 = (float) (Math.cos(Math.toRadians(angel))) * (mFloatBeginOfClockLines - 0) + (float) (mWidthBackgroundProgress / 2);
                 y1 = (float) (Math.sin(Math.toRadians(angel))) * (mFloatBeginOfClockLines - 0) + (float) (mHeightBackgroundProgress / 2);
                 x2 = (float) (Math.cos(Math.toRadians(angel))) * (mFloatLengthOfClockLines - 10) + (float) (mWidthBackgroundProgress / 2);
                 y2 = (float) (Math.sin(Math.toRadians(angel))) * (mFloatLengthOfClockLines - 10) + (float) (mHeightBackgroundProgress / 2);
-
 
             } else {
                 x1 = (float) (Math.cos(Math.toRadians(angel))) * (mFloatBeginOfClockLines - 10) + (float) (mWidthBackgroundProgress / 2);
@@ -425,20 +391,50 @@ public class TempView extends View {
 
     }
 
+    private float getDegreePerHand() {
+        return 360 / (float) getHandCount();
+    }
+
+    private int getHandCount() {
+        int left = (mIntegerMaxValue - mIntegerMinValue);
+        return left % 2 == 0 ? left : left + 1;
+    }
+
+    /*  private float getSweepProgressArc() {
+
+          float d = 5;
+
+          float max = (d > mDegreeValue) ? d - mDegreeValue : (360 - mDegreeValue) + d;
+          float sweep = (mDegreeCurrentTime > mDegreeValue) ? mDegreeCurrentTime - mDegreeValue : 360 - (mDegreeValue - mDegreeCurrentTime);
+
+          if (sweep > max)
+              sweep = max;
+
+          if (mDegreeValue == mDegreeCurrentTime)
+              sweep = 1;
+
+
+          return sweep;
+      }*/
     private float getSweepProgressArc() {
 
-        float d = 5;
 
-        float max = (d > mDegreeStartTime) ? d - mDegreeStartTime : (360 - mDegreeStartTime) + d;
-        float sweep = (mDegreeCurrentTime > mDegreeStartTime) ? mDegreeCurrentTime - mDegreeStartTime : 360 - (mDegreeStartTime - mDegreeCurrentTime);
+        float startProgress = 270;
 
-        if (sweep > max)
-            sweep = max;
+        float sweep = (startProgress < mDegreeValue) ? mDegreeValue - startProgress : 360 - (startProgress - mDegreeValue);
 
-        if (mDegreeStartTime == mDegreeCurrentTime)
+
+        if (mDegreeValue == startProgress)
             sweep = 1;
 
 
+        Log.i(TAG, "min: " + mIntegerMinValue
+                + "\tmax: " + mIntegerMaxValue
+                //  +"\tmax progress: "+max
+                + "\tsweep: " + sweep
+                + "\tmDegreeValue: " + mDegreeValue
+                + "\tstartProgress: " + startProgress
+        );
         return sweep;
     }
 
@@ -468,40 +464,31 @@ public class TempView extends View {
         return drawY;
     }
 
-    public void setStartTimeHour(@IntRange(from = 0, to = 12) int hour) {
+    public void setCurrentValue(int value) {
 
-        hour = validateHour(hour);
+        value = validateValue(value);
+        value = rotateValue(value);
 
-        hour = rotateHour(hour);
-
-        this.mStartTimeHour = hour;
-        mDegreeStartTime = (float) ((mStartTimeHour * 360) / 12);
+        this.mIntegerValue = value;
+        mDegreeValue = (float) ((mIntegerValue * 360) / getHandCount());
 
         invalidate();
     }
 
+    private int rotateValue(int value) {
 
+        int _25 = getHandCount() / 4;
+        int _75 = _25 * 3;
 
+        if (value <= _25)
+            value = value + _75;
 
-
-
-    private float calculateDegreeFromHour(int hour, int minute) {
-        hour = rotateHour(hour);
-        int degreeOfPerHour = 30;
-        int degreeOfHour = ((hour * 360) / 12);
-        int degreeOfMinute = ((minute * degreeOfPerHour) / 60);
-        return degreeOfHour + degreeOfMinute;
-    }
-
-
-    private int rotateHour(int hour) {
-        if (hour <= 3)
-            hour = hour + 9;
         else
-            hour = hour - 3;
+            value = value - _25;
 
-        return hour;
+        return value;
     }
+
 
     private int rotateHourRevert(int hour) {
         if (hour <= 9)
@@ -518,16 +505,19 @@ public class TempView extends View {
         if (end > start) {
             max = end - start;
         } else if (end < start)
-            max = 12 - (start - end);
+            max = getHandCount() - (start - end);
 
         return max;
     }
 
-    private int validateHour(int hour) {
-        if (hour < 0 || hour > 12)
-            hour = 12;
+    private int validateValue(int value) {
+        if (value < mIntegerMinValue)
+            value = mIntegerMinValue;
 
-        return hour;
+        if (value > mIntegerMaxValue)
+            value = mIntegerMaxValue;
+
+        return value;
     }
 
     private int validateMinute(int minute) {
@@ -592,7 +582,7 @@ public class TempView extends View {
 
                     switch (currentCircleIDForMove) {
                         case CIRCLE_START_TIME:
-                            mDegreeStartTime = (float) angel;
+                            mDegreeValue = (float) angel;
 
                             if (onSeekCirclesListener != null)
                                 onSeekCirclesListener.OnSeekChange(currentCircleIDForMove, mAmPmStart, hour, minute);
@@ -734,11 +724,6 @@ public class TempView extends View {
         CIRCLE_REPEAT_TIME
     }
 
-    public enum AM_PM {
-        NONE,
-        AM,
-        PM
-    }
 
     private static class CircleArea {
 

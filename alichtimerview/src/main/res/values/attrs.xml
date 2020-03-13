@@ -36,8 +36,8 @@
             <attr name="tv_color_text_time" format="color" />
             <attr name="tv_stroke_width_background_progress" format="dimension" />
             <attr name="tv_stroke_width_circles" format="dimension" />
-            <attr name="tv_value_start_time_hour" format="integer" />
             <attr name="tv_is_indicator" format="boolean" />
+            <attr name="tv_current_value" format="integer" />
             <attr name="tv_min_value" format="integer" />
             <attr name="tv_max_value" format="integer" />
 

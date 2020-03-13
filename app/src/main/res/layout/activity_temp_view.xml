@@ -31,8 +31,9 @@
         app:layout_constraintEnd_toStartOf="@id/btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:tv_max_value="7"
-        app:tv_min_value="0"
-        app:tv_value_start_time_hour="5" />
+        app:tv_current_value="-10"
+        app:tv_is_indicator="true"
+        app:tv_max_value="20"
+        app:tv_min_value="-10" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

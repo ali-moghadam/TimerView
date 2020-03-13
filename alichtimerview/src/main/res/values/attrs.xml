@@ -23,4 +23,31 @@
         <attr name="atv_is_show_repeat" format="boolean" />
 
     </declare-styleable>
+
+    <!--
+        <declare-styleable name="TempView">
+
+            <attr name="atv_text_center" format="string" />
+            <attr name="atv_text_status" format="string" />
+            <attr name="atv_color_background_progress" format="color" />
+            <attr name="atv_color_background_repeat" format="color" />
+            <attr name="atv_color_progress" format="color" />
+            <attr name="atv_color_start_time_stroke" format="color" />
+            <attr name="atv_color_end_time_stroke" format="color" />
+            <attr name="atv_color_repeat_stroke" format="color" />
+            <attr name="atv_color_text_time" format="color" />
+            <attr name="atv_stroke_width_background_progress" format="dimension" />
+            <attr name="atv_stroke_width_circles" format="dimension" />
+            <attr name="atv_value_start_time_hour" format="integer" />
+            <attr name="atv_value_start_time_minute" format="integer" />
+            <attr name="atv_value_end_time_hour" format="integer" />
+            <attr name="atv_value_end_time_minute" format="integer" />
+            <attr name="atv_value_repeat_start_hour" format="integer" />
+            <attr name="atv_value_repeat_end_hour" format="integer" />
+            <attr name="atv_is_indicator" format="boolean" />
+            <attr name="atv_is_show_repeat" format="boolean" />
+
+        </declare-styleable>
+        -->
+
 </resources>

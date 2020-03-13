@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     tools:context=".IndicatorActivity">
 
-    <com.alirnp.alichtimerview.AliChTimerView
+    <com.alirnp.alichtimerview.TimeView.AliChTimerView
         android:id="@+id/indicator_aliTimerView"
         android:layout_width="@dimen/_220sdp"
         android:layout_height="@dimen/_220sdp"

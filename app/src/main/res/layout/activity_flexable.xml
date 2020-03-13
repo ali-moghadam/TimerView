@@ -12,7 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="0dp">
 
-        <com.alirnp.alichtimerview.AliChTimerView
+        <com.alirnp.alichtimerview.TimeView.AliChTimerView
             android:id="@+id/flexible_aliTimerViewIndicator"
             android:layout_width="@dimen/_220sdp"
             android:layout_height="wrap_content"

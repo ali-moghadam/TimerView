@@ -5,7 +5,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.alirnp.alichtimerview.AliChTimerView;
+import com.alirnp.alichtimerview.TimeView.AliChTimerView;
 
 public class IndicatorActivity extends AppCompatActivity {
 

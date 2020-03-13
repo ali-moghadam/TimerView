@@ -9,8 +9,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
-import com.alirnp.alichtimerview.AliChTimerView;
-import com.alirnp.alichtimerview.OnSeekCirclesListener;
+import com.alirnp.alichtimerview.TimeView.AliChTimerView;
+import com.alirnp.alichtimerview.TimeView.OnSeekCirclesListener;
 import com.example.alichchartview.Need.LockableScrollView;
 
 public class FlexibleActivity extends AppCompatActivity implements CompoundButton.OnCheckedChangeListener {

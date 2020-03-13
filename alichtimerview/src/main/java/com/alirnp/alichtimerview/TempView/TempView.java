@@ -10,6 +10,7 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -40,6 +41,8 @@ public class TempView extends View {
     private final static int DEFAULT_CLOCK_COLOR = Color.parseColor("#CFD8DC");
     private final static int DEFAULT_TEXT_TIME_COLOR = Color.parseColor("#2196F3");
     private static float DEFAULT_SPACE_TEXT = dpToPx(45);
+    private final static int DEFAULT_MIN_VALUE = -10;
+    private final static int DEFAULT_MAX_VALUE = 14;
     int tempHour = -1;
     private Context context;
     private float mDegreeStartTime;
@@ -52,7 +55,6 @@ public class TempView extends View {
     private int mColorStartTime;
     private int mColorTextTime;
     private int mStartTimeHour;
-    private int mStartTimeMinute;
     private String mStringTextCenter;
     private String mStringTextStatus;
     private Paint mPaintBackgroundProgress;
@@ -78,6 +80,9 @@ public class TempView extends View {
     private boolean accessMoving;
     private boolean isIndicator;
     private boolean isShowProgress = true;
+    private static final String TAG = "TempViewLog";
+    private int mIntegerMinValue;
+    private int mIntegerMaxValue;
 
     public TempView(Context context) {
         super(context);
@@ -128,26 +133,6 @@ public class TempView extends View {
         paint.setTextSize(desiredTextSize);
     }
 
-    public static void fillCircleStrokeBorder(
-            Canvas c, float cx, float cy, float radius,
-            int circleColor, float borderWidth, int borderColor, Paint p) {
-
-        int saveColor = p.getColor();
-        p.setColor(circleColor);
-        Paint.Style saveStyle = p.getStyle();
-        p.setStyle(Paint.Style.FILL);
-        c.drawCircle(cx, cy, radius, p);
-        if (borderWidth > 0) {
-            p.setColor(borderColor);
-            p.setStyle(Paint.Style.STROKE);
-            float saveStrokeWidth = p.getStrokeWidth();
-            p.setStrokeWidth(borderWidth);
-            c.drawCircle(cx, cy, radius - (borderWidth / 2), p);
-            p.setStrokeWidth(saveStrokeWidth);
-        }
-        p.setColor(saveColor);
-        p.setStyle(saveStyle);
-    }
 
     public static int dpToPx(float dp) {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
@@ -184,29 +169,28 @@ public class TempView extends View {
 
         if (attrs != null) {
 
-            TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.AliChTimerView, 0, 0);
+            TypedArray a = context.getTheme().obtainStyledAttributes(attrs, R.styleable.TempView, 0, 0);
 
             try {
 
-                setStartTimeHour(a.getInteger(R.styleable.AliChTimerView_atv_value_start_time_hour, 0));
-                setStartTimeMinute(a.getInteger(R.styleable.AliChTimerView_atv_value_start_time_minute, 0));
+                setStartTimeHour(a.getInteger(R.styleable.TempView_tv_value_start_time_hour, 0));
 
-                isIndicator = a.getBoolean(R.styleable.AliChTimerView_atv_is_indicator, true);
+                isIndicator = a.getBoolean(R.styleable.TempView_tv_is_indicator, true);
 
-                mColorBackgroundProgress = a.getColor(R.styleable.AliChTimerView_atv_color_background_progress, DEFAULT_BACKGROUND_PROGRESS_COLOR);
-                mColorStartTime = a.getColor(R.styleable.AliChTimerView_atv_color_start_time_stroke, DEFAULT_START_TIME_STROKE_COLOR);
-                mColorProgress = a.getColor(R.styleable.AliChTimerView_atv_color_progress, DEFAULT_PROGRESS_COLOR);
-                mColorTextTime = a.getColor(R.styleable.AliChTimerView_atv_color_text_time, DEFAULT_TEXT_TIME_COLOR);
+                mColorBackgroundProgress = a.getColor(R.styleable.TempView_tv_color_background_progress, DEFAULT_BACKGROUND_PROGRESS_COLOR);
+                mColorStartTime = a.getColor(R.styleable.TempView_tv_color_start_time_stroke, DEFAULT_START_TIME_STROKE_COLOR);
+                mColorProgress = a.getColor(R.styleable.TempView_tv_color_progress, DEFAULT_PROGRESS_COLOR);
+                mColorTextTime = a.getColor(R.styleable.TempView_tv_color_text_time, DEFAULT_TEXT_TIME_COLOR);
 
-                mStrokeWithCircles = a.getDimension(R.styleable.AliChTimerView_atv_stroke_width_circles, DEFAULT_CIRCLE_STROKE_WIDTH);
-                mStrokeWithBackgroundProgress = a.getDimension(R.styleable.AliChTimerView_atv_stroke_width_background_progress, DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH);
+                mStrokeWithCircles = a.getDimension(R.styleable.TempView_tv_stroke_width_circles, DEFAULT_CIRCLE_STROKE_WIDTH);
+                mStrokeWithBackgroundProgress = a.getDimension(R.styleable.TempView_tv_stroke_width_background_progress, DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH);
 
-                mStringTextCenter = a.getString(R.styleable.AliChTimerView_atv_text_center);
+                mStringTextCenter = a.getString(R.styleable.TempView_tv_text_center);
                 if (mStringTextCenter == null)
                     mStringTextCenter = DEFAULT_TEXT_TIME;
 
 
-                mStringTextStatus = a.getString(R.styleable.AliChTimerView_atv_text_status);
+                mStringTextStatus = a.getString(R.styleable.TempView_tv_text_status);
                 if (mStringTextStatus == null)
                     mStringTextStatus = DEFAULT_TEXT_STATUS;
 
@@ -217,6 +201,9 @@ public class TempView extends View {
                 int minute = cal.get(Calendar.MINUTE);
 
                 mDegreeCurrentTime = calculateDegreeFromHour(hour, minute);
+
+                mIntegerMinValue = a.getInteger(R.styleable.TempView_tv_min_value, DEFAULT_MIN_VALUE);
+                mIntegerMaxValue = a.getInteger(R.styleable.TempView_tv_max_value, DEFAULT_MAX_VALUE);
 
 
             } finally {
@@ -235,8 +222,7 @@ public class TempView extends View {
             mPaintStartTime.setAntiAlias(true);
             mPaintStartTime.setStrokeWidth(mStrokeWithCircles);
             mPaintStartTime.setColor(mColorStartTime);
-            mPaintStartTime.setStyle(Paint.Style.STROKE);
-
+            mPaintStartTime.setStyle(Paint.Style.FILL_AND_STROKE);
 
             mPaintTimeProgress = new Paint();
             mPaintTimeProgress.setAntiAlias(true);
@@ -398,18 +384,26 @@ public class TempView extends View {
 
 
         //CIRCLE START TIME
-        if (isInEditMode())
-            canvas.drawCircle(mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth() / 2, mPaintStartTime);
-        else
-            fillCircleStrokeBorder(canvas, mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth() / 2, Color.WHITE, mStrokeWithCircles, mColorStartTime, mPaintStartTime);
+
+        canvas.drawCircle(mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth() / 2, mPaintStartTime);
 
 
         //CLOCK LINES
-        float angel = 0;
+        float angel = 270;
         float x1, y1, x2, y2;
 
-        for (int i = 0; i < 24; i++) {
-            angel += 15;
+        int left = (mIntegerMaxValue - mIntegerMinValue);
+        int count = left % 2 == 0 ? left : left + 1;
+        float degreePerValue = 360 / (float) count;
+
+        //Log.i(TAG, String.format("\t count=%d \t degree=%d"+count,degreePerValue));
+        Log.i(TAG, "count:" + count + "\tdegree:" + degreePerValue);
+
+
+        for (int i = 0; i < count; i++) {
+
+
+            angel += degreePerValue;
 
             if (i % 2 != 0) {
                 x1 = (float) (Math.cos(Math.toRadians(angel))) * (mFloatBeginOfClockLines - 0) + (float) (mWidthBackgroundProgress / 2);
@@ -481,43 +475,14 @@ public class TempView extends View {
         hour = rotateHour(hour);
 
         this.mStartTimeHour = hour;
-
-        int degreeOfPerHour = 30;
-        int degreeOfHour = ((mStartTimeHour * 360) / 12);
-        int degreeOfMinute = ((mStartTimeMinute * degreeOfPerHour) / 60);
-        mDegreeStartTime = degreeOfHour + degreeOfMinute;
+        mDegreeStartTime = (float) ((mStartTimeHour * 360) / 12);
 
         invalidate();
     }
 
-    public void setStartTimeMinute(@IntRange(from = 0, to = 59) int minute) {
-
-        mStartTimeMinute = validateMinute(minute);
-
-        int degreeOfPerHour = 30;
-        int degreeOfMinute = (mStartTimeMinute * degreeOfPerHour) / 60;
-        mDegreeStartTime = getDegreeFromHour(mStartTimeHour) + degreeOfMinute;
-        invalidate();
-
-    }
 
 
-    public void setStartAmPm(AliChTimerView.AM_PM amPm) {
-        this.mAmPmStart = amPm;
-    }
 
-    public void setStartAmPm(String amPm) {
-        if (amPm.equalsIgnoreCase("pm"))
-            this.mAmPmStart = AliChTimerView.AM_PM.PM;
-        else
-            this.mAmPmStart = AliChTimerView.AM_PM.AM;
-    }
-
-
-    public String getStartTime() {
-
-        return addZeroBeforeTime(rotateHourRevert(mStartTimeHour)) + ":" + addZeroBeforeTime(mStartTimeMinute);
-    }
 
 
     private float calculateDegreeFromHour(int hour, int minute) {

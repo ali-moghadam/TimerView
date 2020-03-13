@@ -37,9 +37,9 @@
             <attr name="tv_stroke_width_background_progress" format="dimension" />
             <attr name="tv_stroke_width_circles" format="dimension" />
             <attr name="tv_is_indicator" format="boolean" />
-            <attr name="tv_current_value" format="integer" />
-            <attr name="tv_min_value" format="integer" />
-            <attr name="tv_max_value" format="integer" />
+            <attr name="tv_current_value" format="float" />
+            <attr name="tv_min_value" format="float" />
+            <attr name="tv_max_value" format="float" />
 
         </declare-styleable>
 

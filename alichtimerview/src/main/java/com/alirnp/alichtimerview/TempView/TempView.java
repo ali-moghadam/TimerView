@@ -28,7 +28,7 @@ public class TempView extends View {
 
     ;
     private static final String DEFAULT_TEXT_TIME = "03:00";
-    private static final String DEFAULT_TEXT_STATUS = "Temp";
+    private static final String DEFAULT_TEXT_STATUS = "temperature";
     private final static int DEFAULT_BACKGROUND_PROGRESS_COLOR = Color.parseColor("#F5F5F5");
     private final static float DEFAULT_BACKGROUND_PROGRESS_RADIUS = dpToPx(120);
     private final static float DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH = dpToPx(20);
@@ -38,8 +38,8 @@ public class TempView extends View {
     private final static int DEFAULT_CLOCK_COLOR = Color.parseColor("#CFD8DC");
     private final static int DEFAULT_TEXT_TIME_COLOR = Color.parseColor("#2196F3");
     private static float DEFAULT_SPACE_TEXT = dpToPx(45);
-    private final static int DEFAULT_MIN_VALUE = -10;
-    private final static int DEFAULT_MAX_VALUE = 14;
+    private final static float DEFAULT_MIN_VALUE = -10;
+    private final static float DEFAULT_MAX_VALUE = 14;
     int tempHour = -1;
     private Context context;
     private float mDegreeValue;
@@ -50,7 +50,7 @@ public class TempView extends View {
     private int mColorBackgroundProgress;
     private int mColorStartTime;
     private int mColorTextTime;
-    private int mIntegerValue;
+    private float mFloatValue;
     private String mStringTextCenter;
     private String mStringTextStatus;
     private Paint mPaintBackgroundProgress;
@@ -76,8 +76,8 @@ public class TempView extends View {
     private boolean accessMoving;
     private boolean isIndicator;
     private static final String TAG = "TempViewLog";
-    private int mIntegerMinValue;
-    private int mIntegerMaxValue;
+    private float mIntegerMinValue;
+    private float mIntegerMaxValue;
 
     public TempView(Context context) {
         super(context);
@@ -185,10 +185,10 @@ public class TempView extends View {
                     mStringTextStatus = DEFAULT_TEXT_STATUS;
 
 
-                mIntegerMinValue = a.getInteger(R.styleable.TempView_tv_min_value, DEFAULT_MIN_VALUE);
-                mIntegerMaxValue = a.getInteger(R.styleable.TempView_tv_max_value, DEFAULT_MAX_VALUE);
+                mIntegerMinValue = a.getFloat(R.styleable.TempView_tv_min_value, DEFAULT_MIN_VALUE);
+                mIntegerMaxValue = a.getFloat(R.styleable.TempView_tv_max_value, DEFAULT_MAX_VALUE);
 
-                setCurrentValue(a.getInteger(R.styleable.TempView_tv_current_value, 0));
+                setCurrentValue(a.getFloat(R.styleable.TempView_tv_current_value, 0));
 
 
 
@@ -365,7 +365,7 @@ public class TempView extends View {
         float angel = 270;
         float x1, y1, x2, y2;
 
-        int count = getHandCount();
+        int count = (int) getHandCount();
         float degreePerHand = getDegreePerHand();
 
         for (int i = 0; i < count; i++) {
@@ -395,27 +395,12 @@ public class TempView extends View {
         return 360 / (float) getHandCount();
     }
 
-    private int getHandCount() {
-        int left = (mIntegerMaxValue - mIntegerMinValue);
+    private float getHandCount() {
+        float left = (mIntegerMaxValue - mIntegerMinValue);
         return left % 2 == 0 ? left : left + 1;
     }
 
-    /*  private float getSweepProgressArc() {
 
-          float d = 5;
-
-          float max = (d > mDegreeValue) ? d - mDegreeValue : (360 - mDegreeValue) + d;
-          float sweep = (mDegreeCurrentTime > mDegreeValue) ? mDegreeCurrentTime - mDegreeValue : 360 - (mDegreeValue - mDegreeCurrentTime);
-
-          if (sweep > max)
-              sweep = max;
-
-          if (mDegreeValue == mDegreeCurrentTime)
-              sweep = 1;
-
-
-          return sweep;
-      }*/
     private float getSweepProgressArc() {
 
 
@@ -464,21 +449,22 @@ public class TempView extends View {
         return drawY;
     }
 
-    public void setCurrentValue(int value) {
+    public void setCurrentValue(float value) {
 
         value = validateValue(value);
         value = rotateValue(value);
 
-        this.mIntegerValue = value;
-        mDegreeValue = (float) ((mIntegerValue * 360) / getHandCount());
+        this.mFloatValue = value;
+
+        mDegreeValue = (value - mIntegerMinValue) * getDegreePerHand();
 
         invalidate();
     }
 
-    private int rotateValue(int value) {
+    private float rotateValue(float value) {
 
-        int _25 = getHandCount() / 4;
-        int _75 = _25 * 3;
+        float _25 = getHandCount() / 4;
+        float _75 = _25 * 3;
 
         if (value <= _25)
             value = value + _75;
@@ -500,8 +486,8 @@ public class TempView extends View {
         return hour;
     }
 
-    private int getMaxProgress(int start, int end) {
-        int max = 0;
+    private float getMaxProgress(int start, int end) {
+        float max = 0;
         if (end > start) {
             max = end - start;
         } else if (end < start)
@@ -510,7 +496,7 @@ public class TempView extends View {
         return max;
     }
 
-    private int validateValue(int value) {
+    private float validateValue(float value) {
         if (value < mIntegerMinValue)
             value = mIntegerMinValue;
 
@@ -520,15 +506,6 @@ public class TempView extends View {
         return value;
     }
 
-    private int validateMinute(int minute) {
-        if (minute < 0)
-            minute = 0;
-
-        else if (minute > 59)
-            minute = 59;
-
-        return minute;
-    }
 
     private float getDegreeFromHour(int hour) {
         return (hour * 360) / 12;

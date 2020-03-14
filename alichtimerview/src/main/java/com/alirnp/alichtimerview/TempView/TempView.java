@@ -10,23 +10,15 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 
 import androidx.annotation.Nullable;
 
 import com.alirnp.alichtimerview.R;
-import com.alirnp.alichtimerview.TimeView.AliChTimerView;
-import com.alirnp.alichtimerview.TimeView.OnMoveListener;
-import com.alirnp.alichtimerview.TimeView.OnSeekCirclesListener;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class TempView extends View {
 
-    ;
     private static final String DEFAULT_TEXT_TIME = "03:00";
     private static final String DEFAULT_TEXT_STATUS = "temperature";
     private final static int DEFAULT_BACKGROUND_PROGRESS_COLOR = Color.parseColor("#F5F5F5");
@@ -67,12 +59,11 @@ public class TempView extends View {
     private float mFloatBeginOfClockLines;
     private int mWidthBackgroundProgress;
     private int mHeightBackgroundProgress;
-    private List<AliChTimerView.CircleArea> mCircles = new ArrayList<>();
-    private AliChTimerView.CircleArea circleArea = new AliChTimerView.CircleArea();
-    private AliChTimerView.CircleID currentCircleIDForMove;
-    private AliChTimerView.AM_PM mAmPmStart = AliChTimerView.AM_PM.AM;
-    private OnSeekCirclesListener onSeekCirclesListener;
-    private OnMoveListener onMoveListener;
+    // private List<CircleArea> mCircles = new ArrayList<>();
+    private CircleArea mCircleArea = new CircleArea();
+
+    private OnSeekChangeListener onSeekCirclesListener;
+
     private boolean accessMoving;
     private boolean isIndicator;
     private static final String TAG = "TempViewLog";
@@ -133,13 +124,6 @@ public class TempView extends View {
         return (int) (dp * Resources.getSystem().getDisplayMetrics().density);
     }
 
-    public void setOnSeekCirclesListener(OnSeekCirclesListener onSeekCirclesListener) {
-        this.onSeekCirclesListener = onSeekCirclesListener;
-    }
-
-    public void setOnMoveListener(OnMoveListener onMoveListener) {
-        this.onMoveListener = onMoveListener;
-    }
 
     public void setIsIndicator(boolean isIndicator) {
         this.isIndicator = isIndicator;
@@ -189,7 +173,6 @@ public class TempView extends View {
                 mIntegerMaxValue = a.getFloat(R.styleable.TempView_tv_max_value, DEFAULT_MAX_VALUE);
 
                 setCurrentValue(a.getFloat(R.styleable.TempView_tv_current_value, 0));
-
 
 
             } finally {
@@ -336,13 +319,11 @@ public class TempView extends View {
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
 
-        mCircles.clear();
 
         mFloatCenterXCircleStartTime = getDrawXOnBackgroundProgress(mDegreeValue, mRadiusBackgroundProgress, mWidthBackgroundProgress);
         mFloatCenterYCircleStartTime = getDrawYOnBackgroundProgress(mDegreeValue, mRadiusBackgroundProgress, mHeightBackgroundProgress);
         //ADD CIRCLE AREA FOR DETECT TOUCH
-        mCircles.add(injectCircleArea(AliChTimerView.CircleID.CIRCLE_START_TIME, mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth()));
-
+        mCircleArea = getCircleArea(mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth());
 
         //BACKGROUNDS
         canvas.drawCircle(mWidthBackgroundProgress / 2, mHeightBackgroundProgress / 2, mRadiusBackgroundProgress, mPaintBackgroundProgress);
@@ -403,36 +384,24 @@ public class TempView extends View {
 
     private float getSweepProgressArc() {
 
-
         float startProgress = 270;
 
         float sweep = (startProgress < mDegreeValue) ? mDegreeValue - startProgress : 360 - (startProgress - mDegreeValue);
 
-
         if (mDegreeValue == startProgress)
             sweep = 1;
 
-
-        Log.i(TAG, "min: " + mIntegerMinValue
-                + "\tmax: " + mIntegerMaxValue
-                //  +"\tmax progress: "+max
-                + "\tsweep: " + sweep
-                + "\tmDegreeValue: " + mDegreeValue
-                + "\tstartProgress: " + startProgress
-        );
         return sweep;
     }
 
-    private AliChTimerView.CircleArea injectCircleArea(AliChTimerView.CircleID circleID, float centerX, float centerY, float radius) {
+    private CircleArea getCircleArea(float centerX, float centerY, float radius) {
 
         radius = radius + (radius / 2);
-        circleArea = new AliChTimerView.CircleArea();
-        circleArea.setCircleID(circleID);
-        circleArea.setXStart(centerX - radius);
-        circleArea.setXEnd(centerX + radius);
-        circleArea.setYStart(centerY - radius);
-        circleArea.setYEnd(centerY + radius);
-        return circleArea;
+        mCircleArea.setXStart(centerX - radius);
+        mCircleArea.setXEnd(centerX + radius);
+        mCircleArea.setYStart(centerY - radius);
+        mCircleArea.setYEnd(centerY + radius);
+        return mCircleArea;
     }
 
     private float getDrawXOnBackgroundProgress(float degree, float backgroundRadius, float backgroundWidth) {
@@ -519,7 +488,6 @@ public class TempView extends View {
             return false;
 
         int hour;
-        int minute;
 
         int x = (int) event.getX();
         int y = (int) event.getY();
@@ -528,22 +496,20 @@ public class TempView extends View {
 
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
-                for (AliChTimerView.CircleArea circleArea : mCircles) {
 
-                    boolean found = (x >= circleArea.getXStart()
-                            && x <= circleArea.getXEnd()
-                            && y >= circleArea.getYStart()
-                            && y <= circleArea.getYEnd());
+
+                boolean found = (x >= mCircleArea.getXStart()
+                        && x <= mCircleArea.getXEnd()
+                        && y >= mCircleArea.getYStart()
+                        && y <= mCircleArea.getYEnd());
 
                     if (found) {
                         accessMoving = true;
-                        currentCircleIDForMove = circleArea.getCircleID();
                         break;
                     } else {
                         accessMoving = false;
-                        currentCircleIDForMove = AliChTimerView.CircleID.NONE;
                     }
-                }
+
 
                 break;
             case MotionEvent.ACTION_MOVE:
@@ -552,21 +518,12 @@ public class TempView extends View {
                     angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
 
                     hour = getHourFromAngel(angel);
-                    minute = getMinuteFromAngel(angel);
 
-                    changeAmPm(hour, tempHour);
-                    tempHour = hour;
+                    mDegreeValue = (float) angel;
 
-                    switch (currentCircleIDForMove) {
-                        case CIRCLE_START_TIME:
-                            mDegreeValue = (float) angel;
+                    if (onSeekCirclesListener != null)
+                        onSeekCirclesListener.onSeekChange(mFloatValue);
 
-                            if (onSeekCirclesListener != null)
-                                onSeekCirclesListener.OnSeekChange(currentCircleIDForMove, mAmPmStart, hour, minute);
-
-                            break;
-
-                    }
 
                     invalidate();
                 }
@@ -575,55 +532,27 @@ public class TempView extends View {
 
                 if (onSeekCirclesListener != null) {
                     angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
+                    onSeekCirclesListener.onSeekComplete(mFloatValue);
+                    break;
 
-                    switch (currentCircleIDForMove) {
-                        case CIRCLE_START_TIME:
-                            onSeekCirclesListener.OnSeekComplete(currentCircleIDForMove, mAmPmStart, getHourFromAngel(angel), getMinuteFromAngel(angel));
-                            break;
-
-                    }
 
                 }
                 accessMoving = false;
-                currentCircleIDForMove = AliChTimerView.CircleID.NONE;
                 break;
-        }
-
-        if (onMoveListener != null) {
-            onMoveListener.OnMove(accessMoving);
         }
 
         return true;
     }
 
-    private void changeAmPm(int hour, int tempHour) {
-        if (tempHour == -1) tempHour = hour;
-        if (hour == 12) {
-            if (tempHour == 11)
-                revertAmPm();
-
-        } else if (hour == 11) {
-            if (tempHour == 12)
-                revertAmPm();
-        }
-    }
-
-    private void revertAmPm() {
-        switch (currentCircleIDForMove) {
-            case CIRCLE_START_TIME:
-
-                if (mAmPmStart == AliChTimerView.AM_PM.AM)
-                    mAmPmStart = AliChTimerView.AM_PM.PM;
-                else
-                    mAmPmStart = AliChTimerView.AM_PM.AM;
-                break;
-
-        }
-
-    }
-
-
     private int getHourFromAngel(double angel) {
+        int hour = (int) (angel + 90) / 30;
+        if (hour == 0) {
+            hour = 12;
+        }
+        return hour;
+    }
+
+    private int getValueFromAngel(double angel) {
         int hour = (int) (angel + 90) / 30;
         if (hour == 0) {
             hour = 12;
@@ -659,10 +588,6 @@ public class TempView extends View {
         return getPaddingLeft() + getPaddingRight();
     }
 
-    public void setmAmPmStart(AliChTimerView.AM_PM mAmPmStart) {
-        this.mAmPmStart = mAmPmStart;
-    }
-
 
     private String addZeroBeforeTime(int time) {
         if (time <= 9)
@@ -694,30 +619,14 @@ public class TempView extends View {
 
     }
 
-    public enum CircleID {
-        NONE,
-        CIRCLE_START_TIME,
-        CIRCLE_END_TIME,
-        CIRCLE_REPEAT_TIME
-    }
-
 
     private static class CircleArea {
 
-        private AliChTimerView.CircleID circleID;
         private float xStart;
         private float xEnd;
 
         private float yStart;
         private float yEnd;
-
-        public AliChTimerView.CircleID getCircleID() {
-            return circleID;
-        }
-
-        public void setCircleID(AliChTimerView.CircleID circleID) {
-            this.circleID = circleID;
-        }
 
         public float getXStart() {
             return xStart;
@@ -751,4 +660,11 @@ public class TempView extends View {
             this.yEnd = yEnd;
         }
     }
+
+    public interface OnSeekChangeListener {
+        void onSeekChange(float value);
+
+        void onSeekComplete(float value);
+    }
+
 }

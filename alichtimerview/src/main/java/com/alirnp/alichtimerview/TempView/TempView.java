@@ -37,31 +37,28 @@ public class TempView extends View {
     private float mDegreeValue;
     private float mRadiusBackgroundProgress;
     private float mStrokeWithBackgroundProgress;
-    private float mStrokeWithCircles;
+    private float mStrokeWithCircle;
     private int mColorProgress;
     private int mColorBackgroundProgress;
-    private int mColorStartTime;
+    private int mColorValue;
     private int mColorTextTime;
     private float mFloatValue;
     private String mStringTextCenter;
     private String mStringTextStatus;
     private Paint mPaintBackgroundProgress;
-    private Paint mPaintStartTime;
+    private Paint mPaintValue;
     private Paint mPaintTimeProgress;
-    private Paint mPaintClock;
+    private Paint mPaintHandClock;
     private Paint mPaintTextTime;
     private Paint mPaintTextReaming;
     private RectF mRectProgress;
     private RectF mRectClock;
-    private float mFloatCenterXCircleStartTime;
-    private float mFloatCenterYCircleStartTime;
     private float mFloatLengthOfClockLines;
     private float mFloatBeginOfClockLines;
     private int mWidthBackgroundProgress;
     private int mHeightBackgroundProgress;
-    // private List<CircleArea> mCircles = new ArrayList<>();
-    private CircleArea mCircleArea = new CircleArea();
 
+    private CircleArea mCircleArea = new CircleArea();
     private OnSeekChangeListener onSeekCirclesListener;
 
     private boolean accessMoving;
@@ -152,11 +149,11 @@ public class TempView extends View {
                 isIndicator = a.getBoolean(R.styleable.TempView_tv_is_indicator, true);
 
                 mColorBackgroundProgress = a.getColor(R.styleable.TempView_tv_color_background_progress, DEFAULT_BACKGROUND_PROGRESS_COLOR);
-                mColorStartTime = a.getColor(R.styleable.TempView_tv_color_start_time_stroke, DEFAULT_START_TIME_STROKE_COLOR);
+                mColorValue = a.getColor(R.styleable.TempView_tv_color_start_time_stroke, DEFAULT_START_TIME_STROKE_COLOR);
                 mColorProgress = a.getColor(R.styleable.TempView_tv_color_progress, DEFAULT_PROGRESS_COLOR);
                 mColorTextTime = a.getColor(R.styleable.TempView_tv_color_text_time, DEFAULT_TEXT_TIME_COLOR);
 
-                mStrokeWithCircles = a.getDimension(R.styleable.TempView_tv_stroke_width_circles, DEFAULT_CIRCLE_STROKE_WIDTH);
+                mStrokeWithCircle = a.getDimension(R.styleable.TempView_tv_stroke_width_circles, DEFAULT_CIRCLE_STROKE_WIDTH);
                 mStrokeWithBackgroundProgress = a.getDimension(R.styleable.TempView_tv_stroke_width_background_progress, DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH);
 
                 mStringTextCenter = a.getString(R.styleable.TempView_tv_text_center);
@@ -187,11 +184,11 @@ public class TempView extends View {
             mPaintBackgroundProgress.setStyle(Paint.Style.STROKE);
 
 
-            mPaintStartTime = new Paint();
-            mPaintStartTime.setAntiAlias(true);
-            mPaintStartTime.setStrokeWidth(mStrokeWithCircles);
-            mPaintStartTime.setColor(mColorStartTime);
-            mPaintStartTime.setStyle(Paint.Style.FILL_AND_STROKE);
+            mPaintValue = new Paint();
+            mPaintValue.setAntiAlias(true);
+            mPaintValue.setStrokeWidth(mStrokeWithCircle);
+            mPaintValue.setColor(mColorValue);
+            mPaintValue.setStyle(Paint.Style.FILL_AND_STROKE);
 
             mPaintTimeProgress = new Paint();
             mPaintTimeProgress.setAntiAlias(true);
@@ -201,12 +198,12 @@ public class TempView extends View {
             mPaintTimeProgress.setStyle(Paint.Style.STROKE);
 
 
-            mPaintClock = new Paint();
-            mPaintClock.setAntiAlias(true);
-            mPaintClock.setStrokeWidth(mPaintBackgroundProgress.getStrokeWidth() / 3.2f);
-            mPaintClock.setColor(DEFAULT_CLOCK_COLOR);
-            mPaintClock.setStyle(Paint.Style.STROKE);
-            mPaintClock.setStrokeCap(Paint.Cap.ROUND);
+            mPaintHandClock = new Paint();
+            mPaintHandClock.setAntiAlias(true);
+            mPaintHandClock.setStrokeWidth(mPaintBackgroundProgress.getStrokeWidth() / 3.2f);
+            mPaintHandClock.setColor(DEFAULT_CLOCK_COLOR);
+            mPaintHandClock.setStyle(Paint.Style.STROKE);
+            mPaintHandClock.setStrokeCap(Paint.Cap.ROUND);
 
             mPaintTextTime = new Paint();
             mPaintTextTime.setAntiAlias(true);
@@ -233,8 +230,7 @@ public class TempView extends View {
         super.onSizeChanged(w, h, oldw, oldh);
 
         mFloatBeginOfClockLines = mRadiusBackgroundProgress - (mStrokeWithBackgroundProgress);
-        mFloatLengthOfClockLines = mRadiusBackgroundProgress - (mStrokeWithBackgroundProgress) - mStrokeWithCircles * 3;
-
+        mFloatLengthOfClockLines = mRadiusBackgroundProgress - (mStrokeWithBackgroundProgress) - mStrokeWithCircle * 3;
 
         mRectProgress.set(
                 (float) mWidthBackgroundProgress / 2 - mRadiusBackgroundProgress,
@@ -320,10 +316,10 @@ public class TempView extends View {
         super.onDraw(canvas);
 
 
-        mFloatCenterXCircleStartTime = getDrawXOnBackgroundProgress(mDegreeValue, mRadiusBackgroundProgress, mWidthBackgroundProgress);
-        mFloatCenterYCircleStartTime = getDrawYOnBackgroundProgress(mDegreeValue, mRadiusBackgroundProgress, mHeightBackgroundProgress);
+        float mFloatCenterXCircleValue = getDrawXOnBackgroundProgress(mDegreeValue, mRadiusBackgroundProgress, mWidthBackgroundProgress);
+        float mFloatCenterYCircleValue = getDrawYOnBackgroundProgress(mDegreeValue, mRadiusBackgroundProgress, mHeightBackgroundProgress);
         //ADD CIRCLE AREA FOR DETECT TOUCH
-        mCircleArea = getCircleArea(mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth());
+        mCircleArea = getCircleArea(mFloatCenterXCircleValue, mFloatCenterYCircleValue, mPaintBackgroundProgress.getStrokeWidth());
 
         //BACKGROUNDS
         canvas.drawCircle(mWidthBackgroundProgress / 2, mHeightBackgroundProgress / 2, mRadiusBackgroundProgress, mPaintBackgroundProgress);
@@ -340,7 +336,7 @@ public class TempView extends View {
 
 
         //CIRCLE START TIME
-        canvas.drawCircle(mFloatCenterXCircleStartTime, mFloatCenterYCircleStartTime, mPaintBackgroundProgress.getStrokeWidth() / 2, mPaintStartTime);
+        canvas.drawCircle(mFloatCenterXCircleValue, mFloatCenterYCircleValue, mPaintBackgroundProgress.getStrokeWidth() / 2, mPaintValue);
 
         //LINES
         float angel = 270;
@@ -367,7 +363,7 @@ public class TempView extends View {
             }
 
 
-            canvas.drawLine(x1, y1, x2, y2, mPaintClock);
+            canvas.drawLine(x1, y1, x2, y2, mPaintHandClock);
         }
 
     }
@@ -445,16 +441,6 @@ public class TempView extends View {
     }
 
 
-    private int rotateHourRevert(int hour) {
-        if (hour <= 9)
-            hour = hour + 3;
-
-        else
-            hour = (hour + 3) - 12;
-
-        return hour;
-    }
-
     private float getMaxProgress(int start, int end) {
         float max = 0;
         if (end > start) {
@@ -476,10 +462,6 @@ public class TempView extends View {
     }
 
 
-    private float getDegreeFromHour(int hour) {
-        return (hour * 360) / 12;
-    }
-
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -487,7 +469,7 @@ public class TempView extends View {
         if (isIndicator)
             return false;
 
-        int hour;
+        float value;
 
         int x = (int) event.getX();
         int y = (int) event.getY();
@@ -503,37 +485,36 @@ public class TempView extends View {
                         && y >= mCircleArea.getYStart()
                         && y <= mCircleArea.getYEnd());
 
-                    if (found) {
-                        accessMoving = true;
-                        break;
-                    } else {
-                        accessMoving = false;
-                    }
-
+                if (found) {
+                    accessMoving = true;
+                    break;
+                } else {
+                    accessMoving = false;
+                }
 
                 break;
             case MotionEvent.ACTION_MOVE:
 
                 if (accessMoving) {
-                    angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
 
-                    hour = getHourFromAngel(angel);
+                    if (onSeekCirclesListener != null) {
+                        angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
+                        value = getValueFromAngel(angel);
+                        mDegreeValue = (float) angel;
+                        onSeekCirclesListener.onSeekChange(value);
 
-                    mDegreeValue = (float) angel;
-
-                    if (onSeekCirclesListener != null)
-                        onSeekCirclesListener.onSeekChange(mFloatValue);
-
-
+                    }
                     invalidate();
                 }
                 break;
             case MotionEvent.ACTION_UP:
 
                 if (onSeekCirclesListener != null) {
-                    angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
-                    onSeekCirclesListener.onSeekComplete(mFloatValue);
-                    break;
+                    {
+                        angel = getAngleFromPoint((double) mWidthBackgroundProgress / 2, (double) mHeightBackgroundProgress / 2, (double) x, (double) y) - 90;
+                        value = getValueFromAngel(angel);
+                        onSeekCirclesListener.onSeekComplete(value);
+                    }
 
 
                 }
@@ -544,31 +525,8 @@ public class TempView extends View {
         return true;
     }
 
-    private int getHourFromAngel(double angel) {
-        int hour = (int) (angel + 90) / 30;
-        if (hour == 0) {
-            hour = 12;
-        }
-        return hour;
-    }
-
-    private int getValueFromAngel(double angel) {
-        int hour = (int) (angel + 90) / 30;
-        if (hour == 0) {
-            hour = 12;
-        }
-        return hour;
-    }
-
-
-    private int getMinuteFromAngel(double angel) {
-        int maxMinute = 59;
-        int maxMinuteDegree = 29;
-        int perClockDegree = 30;
-        int minute = (int) (((angel + 90) % perClockDegree) * maxMinute) / maxMinuteDegree;
-        if (minute == 60)
-            minute = 59;
-        return minute;
+    private float getValueFromAngel(double angel) {
+        return (float) ((angel + 90) / getDegreePerHand()) + mIntegerMinValue;
     }
 
 

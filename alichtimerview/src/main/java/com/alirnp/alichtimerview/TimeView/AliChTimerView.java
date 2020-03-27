@@ -202,10 +202,14 @@ public class AliChTimerView extends View {
 
     public void setTextCenter(String time) {
         this.mStringTextCenter = time;
+    invalidate();
+        requestLayout();
     }
 
     public void setTextStatus(String status) {
         this.mStringTextStatus = status;
+        invalidate();
+        requestLayout();
     }
 
     public void setIsShowProgress(boolean isShow) {

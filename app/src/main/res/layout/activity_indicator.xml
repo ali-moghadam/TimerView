@@ -22,7 +22,7 @@
         app:atv_stroke_width_background_progress="@dimen/_10sdp"
         app:atv_stroke_width_circles="@dimen/_2sdp"
         app:atv_text_center="03:00"
-        app:atv_text_status="Reaming time"
+        app:atv_text_status=""
         app:atv_value_end_time_hour="6"
         app:atv_value_repeat_start_hour="12"
         app:atv_value_start_time_hour="7"

@@ -509,14 +509,22 @@ public class AliChTimerView extends View {
 
             //TEXT
 
-            canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, ((float)mHeightBackgroundProgress / 2 ) + mRadiusBackgroundRepeat /3 , mPaintTextTime);
-            canvas.drawText(mStringTextStatus, mWidthBackgroundProgress / 2,((float)mHeightBackgroundProgress / 2 ) - mRadiusBackgroundRepeat /3  , mPaintTextStatus);
 
+            if (mStringTextStatus.equals("")) {
+                int xPos = (mWidthBackgroundProgress / 2);
+                int yPos = (int) ((mWidthBackgroundProgress / 2) - ((mPaintTextStatus.descent() + mPaintTextStatus.ascent())));
+                canvas.drawText(mStringTextCenter, xPos, yPos, mPaintTextTime);
+            } else {
+                canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, ((float) mHeightBackgroundProgress / 2) + mRadiusBackgroundRepeat / 3, mPaintTextTime);
+                canvas.drawText(mStringTextStatus, mWidthBackgroundProgress / 2, ((float) mHeightBackgroundProgress / 2) - mRadiusBackgroundRepeat / 3, mPaintTextStatus);
+            }
 
         } else {
             //TEXT
-            canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) + DEFAULT_SPACE_TEXT, mPaintTextTime);
-
+            //   canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) + DEFAULT_SPACE_TEXT, mPaintTextTime);
+            int xPos = (mWidthBackgroundProgress / 2);
+            int yPos = (int) ((mWidthBackgroundProgress / 2) - ((mPaintTextStatus.descent() + mPaintTextStatus.ascent())));
+            canvas.drawText(mStringTextCenter, xPos, yPos, mPaintTextTime);
         }
 
 

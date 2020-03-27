@@ -39,38 +39,30 @@ public class AliChTimerView extends View {
     private final static int DEFAULT_REPEAT_COLOR = Color.parseColor("#FDD835");
     private final static int DEFAULT_TEXT_TIME_COLOR = Color.parseColor("#2196F3");
     private static float DEFAULT_SPACE_TEXT = dpToPx(45);
-
+    int tempHour = -1;
     private Context context;
-
     private float mDegreeStartTime;
     private float mDegreeEndTime;
     private float mDegreeStartRepeatTime;
     private float mDegreeCurrentTime;
-
     private float mRadiusBackgroundProgress;
     private float mRadiusBackgroundRepeat;
-
     private float mStrokeWithBackgroundProgress;
     private float mStrokeWithCircles;
-
     private int mColorProgress;
     private int mColorBackgroundProgress;
     private int mColorRepeat;
     private int mColorStartTime;
     private int mColorEndTime;
     private int mColorTextTime;
-
     private int mStartTimeHour;
     private int mStartTimeMinute;
     private int mEndTimeHour;
     private int mEndTimeMinute;
     private int mRepeatStartHour;
     private int mRepeatStartMinute;
-
-
     private String mStringTextCenter;
     private String mStringTextStatus;
-
     private Paint mPaintBackgroundProgress;
     private Paint mPaintBackgroundRepeat;
     private Paint mPaintStartTime;
@@ -80,34 +72,27 @@ public class AliChTimerView extends View {
     private Paint mPaintClock;
     private Paint mPaintRepeat;
     private Paint mPaintTextTime;
-    private Paint mPaintTextReaming;
-
+    private Paint mPaintTextStatus;
     private RectF mRectProgress;
     private RectF mRectRepeatProgress;
     private RectF mRectClock;
-
     private float mFloatCenterXCircleStartTime;
     private float mFloatCenterYCircleStartTime;
     private float mFloatCenterXCircleEndTime;
     private float mFloatCenterYCircleEndTime;
     private float mFloatCenterXCircleStartRepeat;
     private float mFloatCenterYCircleStartRepeat;
-
+    private int mIntCenterTextSize;
+    private int mIntStatusTextSize;
     private float mFloatLengthOfClockLines;
     private float mFloatBeginOfClockLines;
-
     private int mWidthBackgroundProgress;
     private int mHeightBackgroundProgress;
-
     private List<CircleArea> mCircles = new ArrayList<>();
     private CircleArea circleArea = new CircleArea();
-
     private CircleID currentCircleIDForMove;
     private AM_PM mAmPmStart = AM_PM.AM;
     private AM_PM mAmPmEnd = AM_PM.AM;
-
-    int tempHour = -1;
-
     private boolean accessMoving;
     private boolean isIndicator;
     private boolean isShowRepeat;
@@ -163,6 +148,19 @@ public class AliChTimerView extends View {
         paint.setTextSize(desiredTextSize);
     }
 
+    private static int getDesiredTextSize(Paint paint, float desiredWidth, String text) {
+
+        final float testTextSize = 48f;
+
+        paint.setTextSize(testTextSize);
+        Rect bounds = new Rect();
+        paint.getTextBounds(text, 0, text.length(), bounds);
+
+        float desiredTextSize = testTextSize * desiredWidth / bounds.width();
+        return (int)desiredTextSize ;
+
+    }
+
     public static void fillCircleStrokeBorder(
             Canvas c, float cx, float cy, float radius,
             int circleColor, float borderWidth, int borderColor, Paint p) {
@@ -202,7 +200,7 @@ public class AliChTimerView extends View {
 
     public void setTextCenter(String time) {
         this.mStringTextCenter = time;
-    invalidate();
+        invalidate();
         requestLayout();
     }
 
@@ -247,6 +245,10 @@ public class AliChTimerView extends View {
 
                 mStrokeWithCircles = a.getDimension(R.styleable.AliChTimerView_atv_stroke_width_circles, DEFAULT_CIRCLE_STROKE_WIDTH);
                 mStrokeWithBackgroundProgress = a.getDimension(R.styleable.AliChTimerView_atv_stroke_width_background_progress, DEFAULT_BACKGROUND_PROGRESS_STROKE_WIDTH);
+
+                mIntCenterTextSize = a.getDimensionPixelSize(R.styleable.AliChTimerView_atv_text_center_size, dpToPx(50));
+                mIntStatusTextSize = a.getDimensionPixelSize(R.styleable.AliChTimerView_atv_text_status_size, dpToPx(45));
+
 
                 mStringTextCenter = a.getString(R.styleable.AliChTimerView_atv_text_center);
                 if (mStringTextCenter == null)
@@ -327,13 +329,15 @@ public class AliChTimerView extends View {
             mPaintTextTime.setColor(mColorTextTime);
             mPaintTextTime.setTextAlign(Paint.Align.CENTER);
             mPaintTextTime.setStyle(Paint.Style.FILL_AND_STROKE);
+            mPaintTextTime.setTextSize(mIntCenterTextSize);
 
-            mPaintTextReaming = new Paint();
-            mPaintTextReaming.setAntiAlias(true);
-            mPaintTextReaming.setColor(mColorTextTime);
-            mPaintTextReaming.setTextAlign(Paint.Align.CENTER);
-            mPaintTextReaming.setStyle(Paint.Style.FILL_AND_STROKE);
-            mPaintTextReaming.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
+            mPaintTextStatus = new Paint();
+            mPaintTextStatus.setAntiAlias(true);
+            mPaintTextStatus.setColor(mColorTextTime);
+            mPaintTextStatus.setTextAlign(Paint.Align.CENTER);
+            mPaintTextStatus.setStyle(Paint.Style.FILL_AND_STROKE);
+            mPaintTextStatus.setTypeface(Typeface.create(Typeface.DEFAULT, Typeface.ITALIC));
+            mPaintTextStatus.setTextSize(mIntStatusTextSize);
 
             mRectProgress = new RectF();
             mRectRepeatProgress = new RectF();
@@ -366,21 +370,46 @@ public class AliChTimerView extends View {
                 (float) mHeightBackgroundProgress / 2 + mRadiusBackgroundRepeat);
 
         mRectClock.set(
-                ((mWidthBackgroundProgress / 2) - mRadiusBackgroundProgress) + mPaintBackgroundProgress.getStrokeWidth(),
-                ((mHeightBackgroundProgress / 2) - mRadiusBackgroundProgress) + mPaintBackgroundProgress.getStrokeWidth(),
-                ((mWidthBackgroundProgress / 2) + mRadiusBackgroundProgress) - mPaintBackgroundProgress.getStrokeWidth(),
-                ((mHeightBackgroundProgress / 2) + mRadiusBackgroundProgress) - mPaintBackgroundProgress.getStrokeWidth());
+                ((float) (mWidthBackgroundProgress / 2) - mRadiusBackgroundProgress) + mPaintBackgroundProgress.getStrokeWidth(),
+                ((float) (mHeightBackgroundProgress / 2) - mRadiusBackgroundProgress) + mPaintBackgroundProgress.getStrokeWidth(),
+                ((float) (mWidthBackgroundProgress / 2) + mRadiusBackgroundProgress) - mPaintBackgroundProgress.getStrokeWidth(),
+                ((float) (mHeightBackgroundProgress / 2) + mRadiusBackgroundProgress) - mPaintBackgroundProgress.getStrokeWidth());
 
 
-        if (mStringTextStatus.equals("")) {
-            setTextSizeForWidthSingleText(mPaintTextTime, mRadiusBackgroundRepeat, mStringTextCenter);
-        } else {
-
-            setTextSizeForWidth(mPaintTextReaming, mRadiusBackgroundRepeat * 1.2f, mStringTextStatus);
-            setTextSizeForWidth(mPaintTextTime, mRadiusBackgroundRepeat * 1.1f, mStringTextCenter);
-        }
+      //  mPaintTextTime.setTextSize(Math.min(mIntCenterTextSize, getMaxTextSpace(mStringTextCenter)));
+       // mPaintTextStatus.setTextSize(Math.min(mIntStatusTextSize, mRectRepeatProgress.);
+        //adjustTextSize(mPaintTextStatus,mStringTextStatus);
+     // mPaintTextStatus.setTextSize(mRectRepeatProgress);
 
 
+    }
+    void adjustTextSize(Paint mTextPaint,String text) {
+        mTextPaint.setTextSize(100);
+        mTextPaint.setTextScaleX(1.0f);
+        Rect bounds = new Rect();
+        // ask the paint for the bounding rect if it were to draw this
+        // text
+        mTextPaint.getTextBounds(text, 0, text.length(), bounds);
+        // get the height that would have been produced
+        int h = bounds.bottom - bounds.top;
+        // make the text text up 70% of the height
+        float target = (float)mHeightBackgroundProgress *.7f;
+        // figure out what textSize setting would create that height
+        // of text
+        float size = ((target/h)*100f);
+        // and set it into the paint
+        mTextPaint.setTextSize(size);
+    }
+
+    private int getMaxTextSpace(String text){
+        int size = -1 ;
+        Paint paint = new Paint();
+
+        do {
+            paint.setTextSize(++size);
+        }while (paint.measureText(text) < (float) mWidthBackgroundProgress / 2);
+
+        return size;
     }
 
     @Override
@@ -479,8 +508,9 @@ public class AliChTimerView extends View {
             canvas.drawArc(mRectRepeatProgress, mDegreeStartRepeatTime, 10, false, mPaintRepeatProgress);
 
             //TEXT
-            canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) + DEFAULT_SPACE_TEXT, mPaintTextTime);
-            canvas.drawText(mStringTextStatus, mWidthBackgroundProgress / 2, (float) (mHeightBackgroundProgress / 2) - DEFAULT_SPACE_TEXT, mPaintTextReaming);
+
+            canvas.drawText(mStringTextCenter, mWidthBackgroundProgress / 2, ((float)mHeightBackgroundProgress / 2 ) + mRadiusBackgroundRepeat /3 , mPaintTextTime);
+            canvas.drawText(mStringTextStatus, mWidthBackgroundProgress / 2,((float)mHeightBackgroundProgress / 2 ) - mRadiusBackgroundRepeat /3  , mPaintTextStatus);
 
 
         } else {

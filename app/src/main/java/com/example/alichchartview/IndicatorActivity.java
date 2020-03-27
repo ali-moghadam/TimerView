@@ -36,7 +36,7 @@ public class IndicatorActivity extends AppCompatActivity {
                 runOnUiThread(() -> mAliChTimerView.setTextCenter(String.valueOf(number)));
 
             }
-        },1000,1000);
+        },5000,1000);
 
         Timer timer2 = new Timer();
         timer2.schedule(new TimerTask() {
@@ -47,7 +47,7 @@ public class IndicatorActivity extends AppCompatActivity {
                 timer.cancel();
 
             }
-        },5000,1000);
+        },10000,1000);
     }
 
     private void findViews() {

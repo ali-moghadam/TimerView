@@ -23,6 +23,8 @@
         app:atv_stroke_width_circles="@dimen/_2sdp"
         app:atv_text_center="03:00"
         app:atv_text_status=""
+        app:atv_text_center_size="@dimen/_30sdp"
+        app:atv_text_status_size="@dimen/_20sdp"
         app:atv_value_end_time_hour="6"
         app:atv_value_repeat_start_hour="12"
         app:atv_value_start_time_hour="7"

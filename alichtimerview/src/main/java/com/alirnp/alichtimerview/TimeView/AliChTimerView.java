@@ -478,8 +478,6 @@ public class AliChTimerView extends View {
             canvas.drawArc(mRectRepeatProgress, mDegreeStartRepeatTime, 10, false, mPaintRepeatProgress);
 
             //TEXT
-
-
             if (mStringTextStatus.equals("")) {
                 int xPos = (mWidthBackgroundProgress / 2);
                 int yPos = (int) ((mWidthBackgroundProgress / 2) - ((mPaintTextTime.descent() + mPaintTextTime.ascent()) / 2));
@@ -602,6 +600,7 @@ public class AliChTimerView extends View {
         invalidate();
 
     }
+
 
     public void setEndTimeHour(@IntRange(from = 0, to = 12) int hour) {
 
